@@ -1,0 +1,36 @@
+{% load crispy_forms_tags %}
+
+<form
+  method="post"
+  hx-post="{{ request.path }}"
+  hx-target="#modal-content"
+  hx-swap="innerHTML"
+>
+  {% csrf_token %}
+  
+  <div class="modal-header">
+    <h5 class="modal-title">
+      {% if form.instance.pk %}
+        Editando Cliente: <strong>{{ form.instance.nome_razao_social }}</strong>
+      {% else %}
+        Cadastrar Novo Cliente
+      {% endif %}
+    </h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+  </div>
+  
+  <div class="modal-body">
+    {% crispy form %}
+  </div>
+  
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+    <button type="submit" class="btn btn-primary">
+        <span class="htmx-indicator-reverse">Salvar</span>
+        <span class="htmx-indicator">
+            <span class="spinner-border spinner-border-sm"></span>
+            Salvando...
+        </span>
+    </button>
+  </div>
+</form>

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Detalhes do Poço: {{ poco.identificador_poco }}{% endblock %}
+
+{% block content %}
+{# -- CABEÇALHO COM BOTÃO DE VOLTAR -- #}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="mb-0">{{ poco.identificador_poco }}</h1>
+        <small class="text-muted">Cliente: {{ poco.cliente.nome_razao_social }}</small>
+    </div>
+    <a href="{% url 'web:lista_pocos' %}" class="btn btn-secondary">
+        ← Voltar para a Lista de Poços
+    </a>
+</div>
+
+{# -- SEÇÃO COM DADOS DO POÇO -- #}
+<div class="card mb-4">
+    <div class="card-header">
+        <h4>Informações do Poço</h4>
+    </div>
+    <div class="card-body">
+        {# Aqui podemos mostrar os dados principais do poço. Exemplo: #}
+        <p><strong>Profundidade:</strong> {{ poco.profundidade_total }} metros</p>
+        <p><strong>Bomba Instalada:</strong> {{ poco.modelo_bomba_instalada }}</p>
+        <!-- Adicione outros dados importantes aqui -->
+    </div>
+</div>
+
+{# -- SEÇÃO COM O HISTÓRICO DE MANUTENÇÕES -- #}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4>Histórico de Manutenções</h4>
+    <button class="btn btn-primary"
+        hx-get="{% url 'web:manutencao_create' poco.pk %}"
+        hx-target="#modal-content"
+        data-bs-toggle="modal"
+        data-bs-target="#modal">
+        <i class="bi bi-plus-circle"></i> Adicionar Manutenção
+    </button>
+</div>
+
+<div id="tabela-manutencoes-wrapper"
+    hx-get="{% url 'web:detalhes_poco' poco.pk %}"
+    hx-trigger="updateManutencaoList from:body"
+    hx-select="#tabela-manutencoes-wrapper"
+    hx-target="this"
+    hx-swap="outerHTML"
+>
+    {% include 'core/partials/lista_manutencoes_tabela.html' with manutencoes=poco.historico_manutencoes.all %}
+</div>
+{% endblock %}

@@ -1,0 +1,25 @@
+# Arquivo .gitignore
+
+# Ambientes Virtuais
+/venv/
+/env/
+/.env
+
+# Arquivos de Banco de Dados
+*.sqlite3
+db.sqlite3
+
+# Arquivos de Cache do Python
+__pycache__/
+*.pyc
+
+# Arquivos de Mídia e Estáticos Coletados (gerados pelo servidor)
+/media/
+/staticfiles/
+
+# Configurações locais (se você tiver um)
+local_settings.py
+
+# Arquivos de IDEs (ex: VS Code, PyCharm)
+.vscode/
+.idea/

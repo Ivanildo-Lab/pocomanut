@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load static %} {# É uma boa prática carregar o static mesmo que não use diretamente #}
+
+{% block title %}Lista de Poços - PocoManut{% endblock %}
+
+{% block content %}
+    {# ---------------------------------------------------- #}
+    {# CABEÇALHO DA PÁGINA E BOTÃO DE AÇÃO                  #}
+    {# ---------------------------------------------------- #}
+<div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Lista de Poços Cadastrados</h1>
+        
+        <!-- BOTÃO MODIFICADO -->
+        <button type="button" class="btn btn-primary"
+            hx-get="{% url 'web:poco_create' %}"
+            hx-target="#modal-content"
+            hx-swap="innerHTML"
+            data-bs-toggle="modal"
+            data-bs-target="#modal">
+            
+            {# O mesmo ícone de antes #}
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
+                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"/>
+            </svg>
+            Novo Poço
+        </button>
+    </div>
+    {# ---------------------------------------------------- #}
+    {# CAMPO DE BUSCA QUE USA HTMX                          #}
+    {# ---------------------------------------------------- #}
+    <div class="mb-4">
+        <input 
+            type="search" 
+            name="q" 
+            class="form-control" 
+            placeholder="Digite para buscar por identificador do poço ou cliente..."
+            
+            {# Atributos HTMX que fazem a mágica acontecer #}
+            hx-get="{% url 'web:lista_pocos' %}"
+            hx-trigger="keyup changed delay:500ms, search"
+            hx-target="#tabela-pocos-wrapper"
+            hx-swap="innerHTML"
+            hx-indicator="#loading-indicator"
+        >
+        {# Um indicador que aparece durante a busca #}
+        <div id="loading-indicator" class="htmx-indicator">
+            <div class="spinner-border spinner-border-sm" role="status">
+                <span class="visually-hidden">Buscando...</span>
+            </div> 
+            Buscando...
+        </div>
+    </div>
+
+    {# ----------------------------------------------------------------- #}
+    {# WRAPPER/CONTÊINER PARA A TABELA                                   #}
+    {# É este 'div' que será substituído pelo conteúdo via HTMX.         #}
+    {# O conteúdo inicial é preenchido pelo Django na primeira carga.    #}
+    {# ----------------------------------------------------------------- #}
+    <div 
+        id="tabela-pocos-wrapper" 
+        hx-get="{% url 'web:lista_pocos' %}" 
+        hx-trigger="updatePocoList from:body"
+        hx-target="this"
+        hx-swap="innerHTML"
+    >
+        {% include 'core/partials/lista_pocos_tabela.html' %}
+    </div>
+{% endblock %}

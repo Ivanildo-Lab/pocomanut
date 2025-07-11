@@ -1,0 +1,56 @@
+{% load crispy_forms_tags %}
+
+<form
+  method="post"
+  enctype="multipart/form-data" 
+  hx-post="{{ request.path }}"
+  hx-target="#modal-content"
+  hx-swap="innerHTML"
+>
+  {% csrf_token %}
+  
+  <div class="modal-header">
+    <h5 class="modal-title">
+      {% if form.instance.pk %}
+        Editando Poço: <strong>{{ form.instance.identificador_poco }}</strong>
+      {% else %}
+        Cadastrar Novo Poço
+      {% endif %}
+    </h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  </div>
+  
+  <div class="modal-body">
+    {% crispy form %}
+  </div>
+  
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+    <button type="submit" class="btn btn-primary">
+        <span class="htmx-indicator-reverse">Salvar</span>
+        <span class="htmx-indicator">
+            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+            Salvando...
+        </span>
+    </button>
+  </div>
+</form>
+
+{# O script de preview continua o mesmo, mas vamos usar 'form.instance.pk' para checar o ID #}
+<script>
+    const imageInput = document.getElementById('id_foto_principal');
+    const imagePreview = document.getElementById('image-preview');
+
+    if (imageInput && imagePreview) {
+        imageInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+</script>

@@ -1,0 +1,77 @@
+from django.db import models
+
+# Create your models here.
+# Em models.py - Versão Final para Desenvolvimento Inicial
+
+from django.db import models
+from django.contrib.auth.models import User
+
+# Modelo 1: Cliente
+class Cliente(models.Model):
+    nome_razao_social = models.CharField(max_length=200, verbose_name="Nome / Razão Social")
+    cpf_cnpj = models.CharField(max_length=18, unique=True, verbose_name="CPF/CNPJ")
+    telefone = models.CharField(max_length=20, blank=True)
+    email = models.EmailField(blank=True)
+    endereco_principal = models.CharField(max_length=255, blank=True, verbose_name="Endereço Principal")
+    cidade = models.CharField(max_length=100, blank=True)
+    estado = models.CharField(max_length=2, blank=True)
+
+    class Meta:
+        verbose_name = "Cliente"
+        verbose_name_plural = "Clientes"
+
+    def __str__(self):
+        return self.nome_razao_social
+
+# Modelo 2: Poço
+class Poco(models.Model):
+    # --- DADOS DE IDENTIFICAÇÃO E LOCALIZAÇÃO ---
+    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, related_name='pocos')
+    identificador_poco = models.CharField(max_length=100, help_text="Ex: 'Poço Sede da Fazenda', 'Poço Filial 1'", verbose_name="Identificador do Poço")
+    data_perfuração_inicial = models.DateField(verbose_name="Data da Perfuração")
+    endereco_completo = models.CharField(max_length=255, verbose_name="Endereço do Poço")
+    cidade = models.CharField(max_length=100)
+    estado = models.CharField(max_length=2)
+    # --- CAMPO DE FOTO PRINCIPAL DO POÇO ---
+    foto_principal = models.ImageField(upload_to='fotos_pocos/', null=True, blank=True, verbose_name="Foto do Poço")
+
+    # --- CARACTERÍSTICAS CONSTRUTIVAS (Estado Atual do Equipamento) ---
+    profundidade_total = models.DecimalField(max_digits=7, decimal_places=2, help_text="Em metros")
+    diametro_poco = models.DecimalField(max_digits=5, decimal_places=2, help_text="Em polegadas")
+    tubulacao_material = models.CharField(max_length=50, blank=True, help_text="Ex: PVC, Aço Galvanizado", verbose_name="Material da Tubulação")
+    modelo_bomba_instalada = models.CharField(max_length=100, blank=True, verbose_name="Modelo da Bomba")
+    modelo_gerador = models.CharField(max_length=100, blank=True, verbose_name="Modelo do Gerador")
+    painel_comando = models.CharField(max_length=100, blank=True, verbose_name="Painel de Comando")
+
+    class Meta:
+        verbose_name = "Poço"
+        verbose_name_plural = "Poços"
+
+    def __str__(self):
+        return f"{self.identificador_poco} ({self.cliente.nome_razao_social})"
+
+# Modelo 3: Manutenção
+class Manutencao(models.Model):
+    # --- RELACIONAMENTO E DADOS GERAIS ---
+    poco = models.ForeignKey(Poco, on_delete=models.CASCADE, related_name='historico_manutencoes', verbose_name="Poço")
+    data_manutencao = models.DateField(verbose_name="Data da Manutenção")
+    tipo_servico = models.CharField(max_length=100, help_text="Ex: Manutenção Preventiva, Troca de Bomba, Limpeza")
+
+    # --- DADOS MEDIDOS NA VISITA ---
+    nivel_estatico_medido = models.DecimalField(max_digits=7, decimal_places=2, help_text="Em metros", verbose_name="Nível Estático")
+    nivel_dinamico_medido = models.DecimalField(max_digits=7, decimal_places=2, help_text="Em metros", verbose_name="Nível Dinâmico")
+    vazao_medida = models.DecimalField(max_digits=7, decimal_places=2, help_text="Em m³/h", verbose_name="Vazão")
+    amperagem_trabalho = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, verbose_name="Amperagem")
+    tensao_trabalho = models.IntegerField(null=True, blank=True, verbose_name="Tensão (Volts)")
+
+    # --- OPERACIONAL ---
+    operador_responsavel = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, verbose_name="Operador Responsável")
+    observacoes = models.TextField(blank=True, verbose_name="Observações do Serviço")
+
+    class Meta:
+        verbose_name = "Registro de Manutenção"
+        verbose_name_plural = "Registros de Manutenção"
+        ordering = ['-data_manutencao']
+
+    def __str__(self):
+        return f"{self.tipo_servico} em {self.data_manutencao} - {self.poco.identificador_poco}"

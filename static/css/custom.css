@@ -1,0 +1,22 @@
+/* static/css/custom.css (VERSÃO SUPER FORTE) */
+
+/* 
+  Aumentamos a especificidade.
+  Esta regra agora lê-se como:
+  "Encontre uma <table>, dentro dela encontre uma <img> que tenha a classe .table-thumbnail,
+  e aplique estes estilos a ela."
+  Isso é muito mais forte do que apenas ".table-thumbnail".
+*/
+table img.table-thumbnail {
+    width: 60px !important;
+    height: 40px !important;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+/* O resto do CSS para esconder o widget do Django */
+a[href^="/media/fotos_pocos/"] + br + label[for$="-clear_id"],
+a[href^="/media/fotos_pocos/"] + br {
+    display: none;
+}
