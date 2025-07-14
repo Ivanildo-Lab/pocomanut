@@ -1,0 +1,10 @@
+{# core/templates/core/partials/_success_triggers.html #}
+<div
+  hx-trigger="load"
+  hx-swap="none"
+  hx-on:htmx:load="
+    htmx.trigger('body', 'closeModal');
+    htmx.trigger('body', 'showToast', { message: '{{ toast_message|escapejs }}' });
+    htmx.trigger('body', '{{ update_event }}');
+  "
+></div>

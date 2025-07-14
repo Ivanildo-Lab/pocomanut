@@ -1,4 +1,8 @@
-<form hx-post="{% url 'web:cliente_delete' cliente.pk %}" hx-target="body">
+<form
+    hx-post="{% url 'web:cliente_delete' cliente.pk %}"
+    hx-target="#modal-content"
+    hx-swap="innerHTML"
+>
   {% csrf_token %}
   <div class="modal-header">
     <h5 class="modal-title text-danger">Confirmar Exclusão</h5>

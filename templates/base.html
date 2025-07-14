@@ -1,108 +1,129 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{% block title %}PocoManut{% endblock %}</title>
-        <!-- Bootstrap CSS -->
-        <link
-            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-            rel="stylesheet">
-        <!-- Nosso CSS customizado (opcional) -->
-        <link rel="stylesheet" href="{% static 'css/custom.css' %}">
-        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-            {# ===== INÍCIO DOS LINKS DO FAVICON ===== #}
-        {% load static %}
-        <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/icons/apple-touch-icon.png' %}">
-        <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/icons/favicon-32x32.png' %}">
-        <link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/icons/favicon-16x16.png' %}">
-        <link rel="manifest" href="{% static 'img/icons/site.webmanifest' %}">
-        {# A linha abaixo é um fallback para navegadores mais antigos #}
-        <link rel="shortcut icon" href="{% static 'img/icons/favicon.ico' %}">
-        {# ===== FIM DOS LINKS DO FAVICON ===== #}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}PocoManut{% endblock %}</title>
 
-    </head>
-    <body>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-            <div class="container">
-                        <a class="navbar-brand d-flex align-items-center" href="{% url 'web:lista_pocos' %}">
-                            {# Usamos o favicon de 32x32 que é um bom tamanho para o menu #}
-                                <img 
-                                    src="{% static 'img/icons/favicon-64x64.png' %}" 
-                                    alt="Logo PocoManut" 
-                                    width="40" 
-                                    height="40" 
-                                    class="me-3"
-                                >
-                            PocoManut
-                        </a>
+    <!-- CSS Libraries -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 
-                <div class="collapse navbar-collapse">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li class="nav-item">
-                            {# Usamos o namespace 'web' que definimos em pocomanut/urls.py #}
-                            <a class="nav-link" href="{% url 'web:lista_pocos' %}">Poços</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'web:lista_clientes' %}">Clientes</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
+    <!-- Nosso CSS e Favicons -->
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/icons/apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/icons/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/icons/favicon-16x16.png' %}">
+    <link rel="manifest" href="{% static 'img/icons/site.webmanifest' %}">
+    <link rel="shortcut icon" href="{% static 'img/icons/favicon.ico' %}">
 
-        <main class="container">
-            {% block content %}
-            <!-- O conteúdo específico de cada página será inserido aqui -->
-            {% endblock %}
-        </main>
+    {# Adiciona o CSRF Token no head para o JavaScript pegar #}
+    <meta name="csrf-token" content="{{ csrf_token }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="{% url 'web:lista_pocos' %}">
+                <img src="{% static 'img/icons/favicon-64x64.png' %}" alt="Logo PocoManut" width="40" height="40" class="me-3">
+                PocoManut
+            </a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'web:lista_pocos' %}">Poços</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'web:lista_clientes' %}">Clientes</a>
+                    </li>
+                </ul>
+                    {% if user.is_authenticated %}
+                    <span class="navbar-text me-3">
+                        Olá, {{ user.get_full_name|default:user.username }}
+                    </span>
 
-        <footer class="text-center mt-5 text-muted">
-            <p>© {% now "Y" %} PocoManut - Todos os direitos reservados.</p>
-        </footer>
+                    <!-- INÍCIO DO FORMULÁRIO DE LOGOUT -->
+                    <form action="{% url 'web:logout' %}" method="post" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-light">Sair</button>
+                    </form>
+                    <!-- FIM DO FORMULÁRIO DE LOGOUT -->
 
-        <!-- Bootstrap JS -->
-        <script
-            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-        <!-- HTMX - A MÁGICA! -->
-        <script src="https://unpkg.com/htmx.org@1.9.12"></script>
-        <!-- Toastify JS para notificações -->
-        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-
-
-        <!-- ===== INÍCIO DO CONTÊINER DO MODAL GENÉRICO ===== -->
-        <div class="modal fade" id="modal" tabindex="-1">
-            <div class="modal-dialog modal-lg">
-                <div id="modal-content" class="modal-content">
-                    <!-- O conteúdo do formulário será carregado aqui pelo HTMX -->
-                </div>
+                    {% else %}
+                    <a href="{% url 'web:login' %}" class="btn btn-primary">Entrar</a>
+                    {% endif %}
             </div>
         </div>
-        <!-- ===== FIM DO CONTÊINER DO MODAL GENÉRICO ===== -->
-<script>
-    const modalElement = document.getElementById('modal');
-    if (modalElement) {
-        const bsModal = new bootstrap.Modal(modalElement);
-        
-        // Ouve o evento para fechar o modal
-        document.body.addEventListener('closeModal', function(evt) {
-            bsModal.hide();
-        });
-    }
+    </nav>
 
-    // Ouve o evento para mostrar a notificação "toast"
-    document.body.addEventListener('showToast', function(evt) {
-        Toastify({
-            text: evt.detail.message, // Pega a mensagem do evento
-            duration: 3000,          // 3 segundos
-            close: true,
-            gravity: "top",          // `top` ou `bottom`
-            position: "right",       // `left`, `center` ou `right`
-            backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
-            stopOnFocus: true,       // Para o timer quando o mouse está sobre o toast
-        }).showToast();
-    });
-</script>
+    <main class="container">
+        {% block content %}
+        <!-- O conteúdo específico de cada página será inserido aqui -->
+        {% endblock %}
+    </main>
+
+    <footer class="text-center mt-5 text-muted">
+        <p>© {% now "Y" %} PocoManut - Todos os direitos reservados.</p>
+    </footer>
+
+    <!-- ===== INÍCIO DO CONTÊINER DO MODAL GENÉRICO ===== -->
+    <div class="modal fade" id="modal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div id="modal-content" class="modal-content">
+                <!-- O conteúdo do formulário será carregado aqui pelo HTMX -->
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+    <!-- ===== NOSSO SCRIPT CUSTOMIZADO (VERSÃO DE PRODUÇÃO) ===== -->
+    <script>
+        // Esta linha garante que o script só rode depois que o DOM estiver pronto
+        document.addEventListener('DOMContentLoaded', (event) => {
+
+            // --- INÍCIO DA CONFIGURAÇÃO CSRF PARA HTMX ---
+            // Pega o token da meta tag que adicionamos no <head>
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+            // Adiciona um listener que é acionado ANTES de qualquer requisição AJAX do HTMX
+            document.body.addEventListener('htmx:configRequest', function(evt) {
+                // Adiciona o cabeçalho CSRF em requisições que podem alterar dados (POST, PUT, DELETE)
+                // Usamos um objeto para checar os métodos de forma mais limpa
+                const unsafeMethods = { 'POST': true, 'PUT': true, 'DELETE': true };
+                if (unsafeMethods[evt.detail.verb.toUpperCase()]) {
+                    evt.detail.headers['X-CSRFToken'] = csrfToken;
+                }
+            });
+            // --- FIM DA CONFIGURAÇÃO CSRF ---
+
+
+            // --- Lógica do Modal e Notificações ---
+            const modalElement = document.getElementById('modal');
+            if (modalElement) {
+                const bsModal = new bootstrap.Modal(modalElement);
+
+                document.body.addEventListener('closeModal', function(evt) {
+                    bsModal.hide();
+                });
+            }
+
+            document.body.addEventListener('showToast', function(evt) {
+                Toastify({
+                    text: evt.detail.message,
+                    duration: 3000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
+                    stopOnFocus: true,
+                }).showToast();
+            });
+
+        });
+    </script>
 </body>
 </html>

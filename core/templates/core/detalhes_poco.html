@@ -40,12 +40,11 @@
 </div>
 
 <div id="tabela-manutencoes-wrapper"
-    hx-get="{% url 'web:detalhes_poco' poco.pk %}"
+    hx-get="{% url 'web:partial_check_manutencoes' poco.pk %}"
     hx-trigger="updateManutencaoList from:body"
-    hx-select="#tabela-manutencoes-wrapper"
     hx-target="this"
-    hx-swap="outerHTML"
+    hx-swap="innerHTML"
 >
-    {% include 'core/partials/lista_manutencoes_tabela.html' with manutencoes=poco.historico_manutencoes.all %}
+    {% include 'core/partials/lista_manutencoes_tabela.html' with manutencoes=poco.historico_manutencoes.all poco=poco %}
 </div>
 {% endblock %}

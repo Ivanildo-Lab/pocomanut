@@ -9,19 +9,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # --- Configurações de Segurança ---
 # No PythonAnywhere, você definirá a SECRET_KEY como uma variável de ambiente.
 # Para desenvolvimento local, ele usa a chave padrão.
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-sua-chave-local-aqui')
+SECRET_KEY = os.environ.get('SECRET_KEY', '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')
 
 # O DEBUG será False no PythonAnywhere e True localmente.
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = []
-# Adiciona automaticamente o host do PythonAnywhere quando em produção.
-if 'PYTHONANYWHERE_DOMAIN' in os.environ:
-    ALLOWED_HOSTS.append(os.environ['PYTHONANYWHERE_DOMAIN'])
-else:
-    # Permite hosts locais para desenvolvimento.
-    ALLOWED_HOSTS.extend(['127.0.0.1', 'localhost'])
-
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost','geficogestor.pythonanywhere.com']
 
 # --- Aplicações Instaladas ---
 INSTALLED_APPS = [
@@ -43,7 +36,6 @@ INSTALLED_APPS = [
 # --- Middleware ---
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    # WhiteNoise é útil e compatível com PythonAnywhere, pode manter.
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -84,17 +76,29 @@ WSGI_APPLICATION = 'pocomanut.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'pocomanut_db',
-        'USER': 'root',
-        'PASSWORD': 'sua_senha_mysql_local',
-        'HOST': '127.0.0.1',
+        'NAME': 'geficogestor$pocomanut_db',
+        'USER': 'geficogestor',
+        'PASSWORD': 'gefico1234',
+        'HOST': 'geficogestor.mysql.pythonanywhere-services.com',
         'PORT': '3306',
     }
 }
 
 # --- Validadores de Senha ---
-AUTH_PASSWORD_VALIDATORS = [ ... ] # (Mantenha como está)
-
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+]
 # --- Internacionalização ---
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Sao_Paulo'
@@ -111,6 +115,11 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / "media"
 
 STORAGES = {
+    # Define o armazenamento para arquivos de mídia (uploads)
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    # Define o armazenamento para arquivos estáticos (CSS, JS)
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
@@ -118,3 +127,7 @@ STORAGES = {
 
 # --- Configurações Padrão ---
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+LOGIN_URL = 'web:login'
+LOGIN_REDIRECT_URL = 'web:lista_pocos'
+LOGOUT_REDIRECT_URL = 'web:login'
+

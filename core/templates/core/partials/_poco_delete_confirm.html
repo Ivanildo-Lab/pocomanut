@@ -1,8 +1,9 @@
 <form
-  hx-post="{% url 'web:poco_delete' poco.pk %}"
-  hx-target="body" {# Um alvo qualquer, já que a resposta será 204 #}
+    hx-post="{% url 'web:poco_delete' poco.pk %}"
+    hx-target="#modal-content"
+    hx-swap="innerHTML"
 >
-  {% csrf_token %}
+      {% csrf_token %}
   <div class="modal-header">
     <h5 class="modal-title text-danger">Confirmar Exclusão</h5>
     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
