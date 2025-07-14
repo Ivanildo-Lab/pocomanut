@@ -17,8 +17,11 @@ class PocoForm(forms.ModelForm):
             'modelo_gerador', 'painel_comando',
         ]
         widgets = {
-            'data_perfuração_inicial': forms.DateInput(attrs={'type': 'date'}),
-        }
+            'data_perfuração_inicial': forms.DateInput(
+                format='%Y-%m-%d',
+                attrs={'type': 'date'}
+            ),       
+      }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -97,7 +100,11 @@ class ManutencaoForm(forms.ModelForm):
             'tensao_trabalho', 'observacoes',
         ]
         widgets = {
-            'data_manutencao': forms.DateInput(attrs={'type': 'date'}),
+                'data_manutencao': forms.DateInput(
+                    format='%Y-%m-%d',
+                    attrs={'type': 'date'}
+                ),
+
             'observacoes': forms.Textarea(attrs={'rows': 4}),
         }
 
