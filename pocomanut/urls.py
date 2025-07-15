@@ -28,7 +28,7 @@ urlpatterns = [
     path('api/', include('core.urls')),
 
     # Rotas da Aplicação Web (Frontend)
-    path('app/', include('core.web_urls', namespace='web')),
+    path('', include('core.web_urls', namespace='web')),
 ]
 
 if settings.DEBUG:

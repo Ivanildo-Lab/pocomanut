@@ -1,7 +1,7 @@
 # ===================================================================
 # IMPORTAÇÕES
 # ===================================================================
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404,redirect
 from django.views.generic import ListView, DetailView
 from django.http import HttpResponse
 from django.db.models import Q
@@ -77,6 +77,14 @@ class PocoDetailView(DetailView):
 # Todas protegidas por login e usando o padrão de resposta robusto
 # ===================================================================
 
+def index_view(request):
+    if request.user.is_authenticated:
+        # Se o usuário já está logado, redireciona para a lista de poços
+        return redirect('web:lista_pocos')
+    else:
+        # Se não, redireciona para a página de login
+        return redirect('web:login')
+    
 # --- CRUD de Poços ---
 @login_required
 def poco_create_update(request, pk=None):
