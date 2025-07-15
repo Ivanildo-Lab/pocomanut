@@ -42,7 +42,16 @@ class Poco(models.Model):
     modelo_bomba_instalada = models.CharField(max_length=100, blank=True, verbose_name="Modelo da Bomba")
     modelo_gerador = models.CharField(max_length=100, blank=True, verbose_name="Modelo do Gerador")
     painel_comando = models.CharField(max_length=100, blank=True, verbose_name="Painel de Comando")
-
+    profundidade_bomba = models.DecimalField(max_digits=7, decimal_places=2, null=True, blank=True, verbose_name="Profundidade da Bomba (metros)")
+    profundidade_injetor = models.DecimalField(max_digits=7, decimal_places=2, null=True, blank=True, verbose_name="Profundidade do Injetor (metros)")
+    cabo_eletrico = models.CharField(max_length=100, blank=True, verbose_name="Cabo Elétrico")
+    cabo_nautico = models.CharField(max_length=100, blank=True, verbose_name="Cabo Náutico (Segurança)")
+    fusivel_disjuntor = models.CharField(max_length=100, blank=True, verbose_name="Fusível / Disjuntor")
+    contator = models.CharField(max_length=100, blank=True, verbose_name="Contator")
+    rele_termico = models.CharField(max_length=100, blank=True, verbose_name="Relé Térmico")
+    capacitores = models.CharField(max_length=100, blank=True, verbose_name="Capacitores")
+    equipamento_assistencia = models.TextField(blank=True, verbose_name="Equipamento de Assistência Utilizado")
+    
     class Meta:
         verbose_name = "Poço"
         verbose_name_plural = "Poços"

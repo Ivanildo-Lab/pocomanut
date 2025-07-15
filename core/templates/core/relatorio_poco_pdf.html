@@ -32,6 +32,21 @@
             width: 70%;
         }
 
+        .list-container {
+            columns: 1; /* Cria duas colunas para otimizar espaço */
+            -webkit-columns: 1;
+            -moz-columns: 1;
+            column-gap: 50px;
+        }
+        .list-item {
+            padding: 6px 0;
+            border-bottom: 1px dotted #ccc;
+            break-inside: avoid-column; /* Impede que um item quebre entre colunas */
+        }
+        .list-item strong {
+            font-weight: bold;
+        }
+
         /* Estilos para a seção de manutenções (mantidos) */
         .manutencao-block { border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px; }
         .manutencao-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 20px; }
@@ -74,31 +89,24 @@
 
     <!-- ===== SEÇÃO DE CARACTERÍSTICAS - NOVO LAYOUT DE TABELA ===== -->
     <div class="section-title">Características Construtivas e Equipamentos</div>
-    <table class="data-table">
-        <tr>
-            <td class="label">Data da Perfuração:</td>
-            <td class="value">{{ poco.data_perfuração_inicial|date:"d/m/Y" }}</td>
-            <td class="label">Profundidade Total:</td>
-            <td class="value">{{ poco.profundidade_total }} metros</td>
-        </tr>
-        <tr>
-            <td class="label">Diâmetro:</td>
-            <td class="value">{{ poco.diametro_poco }} polegadas</td>
-            <td class="label">Material da Tubulação:</td>
-            <td class="value">{{ poco.tubulacao_material|default:"Não informado" }}</td>
-        </tr>
-        <tr>
-            <td class="label">Bomba Instalada:</td>
-            <td class="value">{{ poco.modelo_bomba_instalada|default:"Não informado" }}</td>
-            <td class="label">Modelo do Gerador:</td>
-            <td class="value">{{ poco.modelo_gerador|default:"Não informado" }}</td>
-        </tr>
-         <tr>
-            <td class="label">Painel de Comando:</td>
-            <td class="value" colspan="3">{{ poco.painel_comando|default:"Não informado" }}</td>
-        </tr>
-    </table>
-
+    <div class="list-container">
+        <div class="list-item"><strong>Data da Perfuração:</strong> {{ poco.data_perfuração_inicial|date:"d/m/Y" }}</div>
+        <div class="list-item"><strong>Profundidade Total:</strong> {{ poco.profundidade_total }} metros</div>
+        <div class="list-item"><strong>Diâmetro:</strong> {{ poco.diametro_poco }} polegadas</div>
+        <div class="list-item"><strong>Material da Tubulação:</strong> {{ poco.tubulacao_material|default:"Não informado" }}</div>
+        <div class="list-item"><strong>Profundidade da Bomba:</strong> {{ poco.profundidade_bomba|default:"Não informado" }} metros</div>
+        <div class="list-item"><strong>Profundidade do Injetor:</strong> {{ poco.profundidade_injetor|default:"Não informado" }} metros</div>
+        <div class="list-item"><strong>Cabo Elétrico:</strong> {{ poco.cabo_eletrico|default:"Não informado" }}</div>
+        <div class="list-item"><strong>Cabo Náutico (Segurança):</strong> {{ poco.cabo_nautico|default:"Não informado" }}</div>
+        <div class="list-item"><strong>Modelo da Bomba Instalada:</strong> {{ poco.modelo_bomba_instalada|default:"Não informado" }}</div>
+        <div class="list-item"><strong>Modelo do Gerador:</strong> {{ poco.modelo_gerador|default:"Não informado" }}</div>
+        <div class="list-item"><strong>Painel de Comando:</strong> {{ poco.painel_comando|default:"Não informado" }}</div>
+        <div class="list-item"><strong>Fusível / Disjuntor:</strong> {{ poco.fusivel_disjuntor|default:"Não informado" }}</div>
+        <div class="list-item"><strong>Contator:</strong> {{ poco.contator|default:"Não informado" }}</div>
+        <div class="list-item"><strong>Relé Térmico:</strong> {{ poco.rele_termico|default:"Não informado" }}</div>
+        <div class="list-item"><strong>Capacitores:</strong> {{ poco.capacitores|default:"Não informado" }}</div>
+        <div class="list-item"><strong>Equipamento de Assistência:</strong> {{ poco.equipamento_assistencia|linebreaksbr|default:"Não informado" }}</div>
+    </div>
     <!-- ===== SEÇÃO DE HISTÓRICO DE MANUTENÇÕES (LAYOUT MANTIDO) ===== -->
     <div class="section-title">Histórico de Manutenções</div>
     {% for manutencao in poco.historico_manutencoes.all %}
