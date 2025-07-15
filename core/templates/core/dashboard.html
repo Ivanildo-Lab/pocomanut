@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - PocoManut{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Dashboard</h1>
+
+<!-- Linha de Cards de Resumo -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h5 class="card-title">Total de Clientes</h5>
+                <p class="card-text fs-2 fw-bold">{{ total_clientes }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5 class="card-title">Total de Poços</h5>
+                <p class="card-text fs-2 fw-bold">{{ total_pocos }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <h5 class="card-title">Manutenções Realizadas</h5>
+                <p class="card-text fs-2 fw-bold">{{ total_manutencoes }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <h5 class="card-title">Vazão Média (m³/h)</h5>
+                <p class="card-text fs-2 fw-bold">{{ vazao_media|floatformat:2 }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Linha com Gráfico e Últimas Atividades -->
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Manutenções nos Últimos 12 Meses</h5>
+                <canvas id="manutencoesChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Últimas Atividades</h5>
+                <ul class="list-group list-group-flush">
+                    {% for manutencao in ultimas_manutencoes %}
+                        <li class="list-group-item">
+                            <a href="{% url 'web:detalhes_poco' manutencao.poco.pk %}">
+                                <strong>{{ manutencao.poco.identificador_poco }}</strong>
+                            </a>
+                            <small class="text-muted d-block">{{ manutencao.data_manutencao|date:"d/m/Y" }} - {{ manutencao.tipo_servico }}</small>
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item">Nenhuma atividade recente.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script para inicializar o gráfico -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const ctx = document.getElementById('manutencoesChart');
+        new Chart(ctx, {
+            type: 'bar', // ou 'line'
+            data: {
+                labels: {{ grafico_labels|safe }},
+                datasets: [{
+                    label: '# de Manutenções',
+                    data: {{ grafico_data|safe }},
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0 // Garante que o eixo Y não tenha casas decimais
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

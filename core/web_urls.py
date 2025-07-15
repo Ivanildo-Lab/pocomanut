@@ -3,13 +3,14 @@
 from django.urls import path
 from django.contrib.auth.views import LogoutView
 from . import views # Importa o módulo de views para chamar a index_view
+from .views import dashboard_view
 
 app_name = 'web'
 
 urlpatterns = [
     # --- Rota Raiz e Autenticação ---
     # A raiz do site agora aponta para a nossa view de redirecionamento
-    path('', views.index_view, name='index'), 
+    path('', dashboard_view, name='dashboard'), # Rota para o dashboard
     path('login/', views.CustomLoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
 

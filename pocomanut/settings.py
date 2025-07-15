@@ -128,7 +128,7 @@ STORAGES = {
 # --- Configurações Padrão ---
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = 'web:login'
-LOGIN_REDIRECT_URL = 'web:lista_pocos'
+LOGIN_REDIRECT_URL = 'web:dashboard'
 LOGOUT_REDIRECT_URL = 'web:login'
 try:
     from .local_settings import *

@@ -29,14 +29,17 @@
                 PocoManut
             </a>
             <div class="collapse navbar-collapse">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'web:lista_pocos' %}">Poços</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'web:lista_clientes' %}">Clientes</a>
-                    </li>
-                </ul>
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link {% if pagina_ativa == 'dashboard' %}active{% endif %}" href="{% url 'web:dashboard' %}">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if pagina_ativa == 'pocos' %}active{% endif %}" href="{% url 'web:lista_pocos' %}">Poços</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if pagina_ativa == 'clientes' %}active{% endif %}" href="{% url 'web:lista_clientes' %}">Clientes</a>
+                        </li>
+                    </ul>                    
                     {% if user.is_authenticated %}
                     <span class="navbar-text me-3">
                         Olá, {{ user.get_full_name|default:user.username }}
@@ -79,7 +82,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/htmx.org@1.9.12"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-
+    <!-- Chart.js -  -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- ===== NOSSO SCRIPT CUSTOMIZADO (VERSÃO DE PRODUÇÃO) ===== -->
     <script>
         // Esta linha garante que o script só rode depois que o DOM estiver pronto

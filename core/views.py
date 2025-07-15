@@ -18,6 +18,57 @@ from .models import Cliente, Poco, Manutencao
 from .forms import PocoForm, ClienteForm, ManutencaoForm
 from .serializers import ClienteSerializer, PocoSerializer, ManutencaoSerializer
 
+# Importações adicionais do dashboard
+from django.db.models import Count, Avg
+from django.db.models.functions import TruncMonth
+from django.utils import timezone
+import json
+
+# ===================================================================
+# GERAR O DASHBOARD
+# ===================================================================
+@login_required
+def dashboard_view(request):
+    # --- Cálculos para os Cards de Resumo ---
+    total_clientes = Cliente.objects.count()
+    total_pocos = Poco.objects.count()
+    total_manutencoes = Manutencao.objects.count()
+    
+    # Métrica de vazão média (evita erro se não houver manutenções)
+    vazao_media_data = Manutencao.objects.aggregate(media=Avg('vazao_medida'))
+    vazao_media = vazao_media_data['media'] or 0
+
+    # --- Dados para o Gráfico de Manutenções por Mês ---
+    # Pega os últimos 12 meses
+    doze_meses_atras = timezone.now() - timezone.timedelta(days=365)
+    
+    manutencoes_por_mes = (
+        Manutencao.objects
+        .filter(data_manutencao__gte=doze_meses_atras)
+        .annotate(mes=TruncMonth('data_manutencao'))
+        .values('mes')
+        .annotate(total=Count('id'))
+        .order_by('mes')
+    )
+    # Formata os dados para o Chart.js
+    grafico_labels = [m['mes'].strftime('%b/%Y') for m in manutencoes_por_mes]
+    grafico_data = [m['total'] for m in manutencoes_por_mes]
+    
+    # --- Dados para a Tabela de Últimas Atividades ---
+    ultimas_manutencoes = Manutencao.objects.select_related('poco', 'poco__cliente').order_by('-data_manutencao')[:5]
+
+    context = {
+        'total_clientes': total_clientes,
+        'total_pocos': total_pocos,
+        'total_manutencoes': total_manutencoes,
+        'vazao_media': vazao_media,
+        'grafico_labels': json.dumps(grafico_labels), # Converte para string JSON
+        'grafico_data': json.dumps(grafico_data),
+        'ultimas_manutencoes': ultimas_manutencoes,
+        'pagina_ativa': 'dashboard' # Para destacar o link no menu
+    }
+    return render(request, 'core/dashboard.html', context)
+
 # ===================================================================
 # VIEWS DE AUTENTICAÇÃO
 # ===================================================================
@@ -76,14 +127,6 @@ class PocoDetailView(DetailView):
 # VIEWS DE CRUD (CREATE, UPDATE, DELETE)
 # Todas protegidas por login e usando o padrão de resposta robusto
 # ===================================================================
-
-def index_view(request):
-    if request.user.is_authenticated:
-        # Se o usuário já está logado, redireciona para a lista de poços
-        return redirect('web:lista_pocos')
-    else:
-        # Se não, redireciona para a página de login
-        return redirect('web:login')
     
 # --- CRUD de Poços ---
 @login_required
@@ -187,7 +230,6 @@ def partial_check_manutencoes(request, poco_pk):
     poco = get_object_or_404(Poco, pk=poco_pk)
     context = {'manutencoes': poco.historico_manutencoes.all(), 'poco': poco}
     return render(request, 'core/partials/lista_manutencoes_tabela.html', context)
-
 # ===================================================================
 # VIEW DE GERAÇÃO DE PDF
 # ===================================================================
