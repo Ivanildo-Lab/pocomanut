@@ -15,11 +15,12 @@
             {% for poco in object_list %}
                 <tr>
                     <td>
-                        {% if poco.foto_principal %}
-                            <img src="{{ poco.foto_principal.url }}" alt="Foto do poço" class="table-thumbnail">
-                        {% else %}
-                            <span class="text-muted" style="font-size: 0.8rem;">S/ Foto</span>
-                        {% endif %}
+                        {% load static %}
+                        <img 
+                            src="{% if poco.foto_principal %}{{ poco.foto_principal.url }}{% else %}{% static 'img/poco-placeholder.jpg' %}{% endif %}" 
+                            alt="Foto do poço" 
+                            class="table-thumbnail"
+                        >                    
                     </td>
                 <td>{{ poco.identificador_poco }}</td>
                 <td>{{ poco.cliente.nome_razao_social }}</td>

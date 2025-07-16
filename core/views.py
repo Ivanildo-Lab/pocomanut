@@ -9,7 +9,7 @@ from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
 from weasyprint import HTML
-
+from pathlib import Path
 # Importações da API REST (podem ser mantidas)
 from rest_framework import viewsets, permissions
 
@@ -23,6 +23,8 @@ from django.db.models import Count, Avg
 from django.db.models.functions import TruncMonth
 from django.utils import timezone
 import json
+from django.conf import settings
+import os
 
 # ===================================================================
 # GERAR O DASHBOARD
@@ -236,13 +238,33 @@ def partial_check_manutencoes(request, poco_pk):
 @login_required
 def gerar_relatorio_pdf(request, pk):
     poco = get_object_or_404(Poco, pk=pk)
-    html_string = render_to_string('core/relatorio_poco_pdf.html', {'poco': poco})
-    html = HTML(string=html_string, base_url=request.build_absolute_uri())
+    
+    # --- LÓGICA CORRIGIDA PARA O CAMINHO DA IMAGEM ---
+    caminho_imagem = None
+    if poco.foto_principal:
+        # Cria o caminho completo do arquivo
+        caminho_completo = Path(settings.MEDIA_ROOT) / poco.foto_principal.name
+        
+        # Verifica se o arquivo existe E o transforma em uma URL file://
+        if caminho_completo.exists():
+            caminho_imagem = caminho_completo.as_uri()    # --------------------------------------------------
+
+    context = {
+        'poco': poco,
+        'caminho_imagem': caminho_imagem # Passa o caminho para o template
+    }
+    
+    html_string = render_to_string('core/relatorio_poco_pdf.html', context)
+    
+    # O base_url é importante para que o WeasyPrint possa resolver outros caminhos relativos
+    html = HTML(string=html_string, base_url=request.build_absolute_uri('/'))
+    
     pdf = html.write_pdf()
+    
     response = HttpResponse(pdf, content_type='application/pdf')
     response['Content-Disposition'] = f'inline; filename="relatorio_poco_{poco.id}.pdf"'
+    
     return response
-
 # ===================================================================
 # VIEWS DA API REST (mantidas para referência ou uso futuro)
 # ===================================================================

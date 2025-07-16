@@ -12,49 +12,20 @@
         .report-title { text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 5px; }
         .report-subtitle { text-align: center; font-size: 16px; font-weight: normal; margin-bottom: 25px; color: #555; }
         .section-title { background-color: #e9ecef; border-left: 5px solid #0056b3; padding: 8px 12px; margin-top: 25px; margin-bottom: 15px; font-size: 14px; font-weight: bold; }
-        
-        /* --- ESTILOS PARA A NOVA TABELA DE DADOS --- */
-        .data-table {
-            width: 100%;
-            border-collapse: collapse; /* Remove o espaçamento entre as bordas */
-            margin-bottom: 20px;
-        }
-        .data-table td {
-            padding: 8px;
-            border: 1px solid #ddd;
-        }
-        .data-table td.label {
-            font-weight: bold;
-            background-color: #f8f9fa; /* Fundo levemente cinza para os rótulos */
-            width: 30%; /* Largura fixa para a coluna de rótulos */
-        }
-        .data-table td.value {
-            width: 70%;
-        }
-
-        .list-container {
-            columns: 1; /* Cria duas colunas para otimizar espaço */
-            -webkit-columns: 1;
-            -moz-columns: 1;
-            column-gap: 50px;
-        }
-        .list-item {
-            padding: 6px 0;
-            border-bottom: 1px dotted #ccc;
-            break-inside: avoid-column; /* Impede que um item quebre entre colunas */
-        }
-        .list-item strong {
-            font-weight: bold;
-        }
-
-        /* Estilos para a seção de manutenções (mantidos) */
-        .manutencao-block { border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px; }
+        .data-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        .data-table td { padding: 8px; border: 1px solid #ddd; }
+        .data-table td.label { font-weight: bold; background-color: #f8f9fa; width: 30%; }
+        .data-table td.value { width: 70%; }
+        .list-container { columns: 1; -webkit-columns: 1; -moz-columns: 1; column-gap: 50px; }
+        .list-item { padding: 6px 0; border-bottom: 1px dotted #ccc; break-inside: avoid-column; }
+        .list-item strong { font-weight: bold; }
+        .photo-section { text-align: center; margin-top: 20px; margin-bottom: 20px; page-break-inside: avoid; }
+        img.poco-foto { max-width: 80%; max-height: 300px; display: block; margin: 10px auto; border-radius: 5px; border: 1px solid #ddd; }
+        .manutencao-block { border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px; page-break-inside: avoid; }
         .manutencao-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 20px; }
         .manutencao-item { padding: 6px 0; border-bottom: 1px dotted #ccc; }
         .manutencao-item strong { display: block; font-size: 10px; color: #555; text-transform: uppercase; margin-bottom: 3px; }
         .full-width-item { grid-column: 1 / -1; }
-
-        img.poco-foto { max-width: 60%; max-height: 250px; display: block; margin: 20px auto; border-radius: 5px; border: 1px solid #ddd; }
     </style>
 </head>
 <body>
@@ -66,11 +37,7 @@
     <div class="report-title">Relatório Técnico de Poço Tubular</div>
     <h2 class="report-subtitle">{{ poco.identificador_poco }}</h2>
 
-    {% if poco.foto_principal %}
-        <img src="{{ poco.foto_principal.path }}" class="poco-foto" alt="Foto do Poço">
-    {% endif %}
-
-    <!-- ===== SEÇÃO DE DADOS DO CLIENTE - NOVO LAYOUT DE TABELA ===== -->
+    <!-- SEÇÃO DE DADOS DO CLIENTE -->
     <div class="section-title">Dados do Cliente e Localização</div>
     <table class="data-table">
         <tr>
@@ -85,11 +52,23 @@
             <td class="label">Endereço do Poço:</td>
             <td class="value">{{ poco.endereco_completo }}, {{ poco.cidade }}/{{ poco.estado }}</td>
         </tr>
+        <tr>
+            <td class="label">Localização Geográfica:</td>
+            <td class="value">{{ poco.localizacao_mapa|default:"Não informado"}}</td>
+        </tr>
     </table>
 
-    <!-- ===== SEÇÃO DE CARACTERÍSTICAS - NOVO LAYOUT DE TABELA ===== -->
+    <!-- SEÇÃO DA FOTO (ÚNICA E CORRETA) -->
+    {% if caminho_imagem %}
+        <div class="photo-section">
+            <div class="section-title" style="text-align: left;">Foto Principal do Poço</div>
+            <img src="{{ caminho_imagem }}" class="poco-foto" alt="Foto do Poço">
+        </div>
+    {% endif %}
+    <!-- SEÇÃO DE CARACTERÍSTICAS -->
     <div class="section-title">Características Construtivas e Equipamentos</div>
     <div class="list-container">
+        <!-- ... (sua lista de características está correta) ... -->
         <div class="list-item"><strong>Data da Perfuração:</strong> {{ poco.data_perfuração_inicial|date:"d/m/Y" }}</div>
         <div class="list-item"><strong>Profundidade Total:</strong> {{ poco.profundidade_total }} metros</div>
         <div class="list-item"><strong>Diâmetro:</strong> {{ poco.diametro_poco }} polegadas</div>
@@ -107,9 +86,11 @@
         <div class="list-item"><strong>Capacitores:</strong> {{ poco.capacitores|default:"Não informado" }}</div>
         <div class="list-item"><strong>Equipamento de Assistência:</strong> {{ poco.equipamento_assistencia|linebreaksbr|default:"Não informado" }}</div>
     </div>
-    <!-- ===== SEÇÃO DE HISTÓRICO DE MANUTENÇÕES (LAYOUT MANTIDO) ===== -->
+    
+    <!-- SEÇÃO DE HISTÓRICO DE MANUTENÇÕES -->
     <div class="section-title">Histórico de Manutenções</div>
     {% for manutencao in poco.historico_manutencoes.all %}
+        <!-- ... (seu loop de manutenções está correto) ... -->
         <div class="manutencao-block">
             <div class="manutencao-grid">
                 <div class="manutencao-item"><strong>Data:</strong> {{ manutencao.data_manutencao|date:"d/m/Y" }}</div>
