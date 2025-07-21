@@ -16,12 +16,14 @@
                 <tr>
                     <td>
                         {% load static %}
-                        <img 
-                            src="{% if poco.foto_principal %}{{ poco.foto_principal.url }}{% else %}{% static 'img/poco-placeholder.jpg' %}{% endif %}" 
-                            alt="Foto do poço" 
-                            class="table-thumbnail"
-                        >                    
-                    </td>
+                        {% with foto_principal=poco.get_foto_principal %}
+                            <img 
+                                src="{% if foto_principal %}{{ foto_principal.imagem.url }}{% else %}{% static 'img/poco-placeholder.jpg' %}{% endif %}" 
+                                alt="Foto do poço" 
+                                class="table-thumbnail"
+                            >
+                        {% endwith %}
+                    </td>                
                 <td>{{ poco.identificador_poco }}</td>
                 <td>{{ poco.cliente.nome_razao_social }}</td>
                 <td>{{ poco.cidade }}/{{ poco.estado }}</td>

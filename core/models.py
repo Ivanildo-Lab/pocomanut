@@ -6,6 +6,32 @@ from django.db import models
 from django.db import models
 from django.contrib.auth.models import User
 
+# Modelo 00: UserProfile
+# Este modelo estende o User do Django para incluir informações adicionais sobre o usuário, como a empresa associada.
+# Ele cria uma relação de um-para-um com o modelo User e uma relação de muitos-para-um com o modelo Empresa.
+# Modelo 0: Empresa
+
+class Empresa(models.Model):
+    nome_fantasia = models.CharField(max_length=200, unique=True)
+    razao_social = models.CharField(max_length=200, blank=True)
+    cidade = models.CharField(max_length=200, blank=True)
+    estado = models.CharField(max_length=2, blank=True)
+    email = models.EmailField(blank=True,default='')
+    cnpj = models.CharField(max_length=18, blank=True)
+    telefone = models.CharField(max_length=20, blank=True)
+    logo = models.ImageField(upload_to='logos_empresas/', null=True, blank=True)
+
+    def __str__(self):
+        return self.nome_fantasia
+    
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.empresa.nome_fantasia}"
+
+
 # Modelo 1: Cliente
 class Cliente(models.Model):
     nome_razao_social = models.CharField(max_length=200, verbose_name="Nome / Razão Social")
@@ -15,6 +41,7 @@ class Cliente(models.Model):
     endereco_principal = models.CharField(max_length=255, blank=True, verbose_name="Endereço Principal")
     cidade = models.CharField(max_length=100, blank=True)
     estado = models.CharField(max_length=2, blank=True)
+    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = "Cliente"
@@ -33,7 +60,7 @@ class Poco(models.Model):
     cidade = models.CharField(max_length=100)
     estado = models.CharField(max_length=2)
     # --- CAMPO DE FOTO PRINCIPAL DO POÇO ---
-    foto_principal = models.ImageField(upload_to='fotos_pocos/', null=True, blank=True, verbose_name="Foto do Poço")
+    #foto_principal = models.ImageField(upload_to='fotos_pocos/', null=True, blank=True, verbose_name="Foto do Poço")
     localizacao_mapa = models.CharField(max_length=255, null=True,blank=True,verbose_name="Localização Geografica")
 
     # --- CARACTERÍSTICAS CONSTRUTIVAS (Estado Atual do Equipamento) ---
@@ -53,6 +80,15 @@ class Poco(models.Model):
     capacitores = models.CharField(max_length=100, blank=True, verbose_name="Capacitores")
     equipamento_assistencia = models.TextField(blank=True, verbose_name="Equipamento de Assistência Utilizado")
     
+    # --- RELACIONAMENTO COM FOTOS ---
+    def get_foto_principal(self):
+        # Tenta encontrar uma foto marcada como principal,
+        # ou pega a primeira foto se nenhuma for marcada.
+        foto = self.fotos.filter(is_principal=True).first()
+        if not foto:
+            foto = self.fotos.first()
+        return foto
+    
     class Meta:
         verbose_name = "Poço"
         verbose_name_plural = "Poços"
@@ -60,6 +96,19 @@ class Poco(models.Model):
     def __str__(self):
         return f"{self.identificador_poco} ({self.cliente.nome_razao_social})"
 
+class FotoPoco(models.Model):
+    poco = models.ForeignKey(Poco, on_delete=models.CASCADE, related_name='fotos')
+    imagem = models.ImageField(upload_to='fotos_pocos/')
+    descricao = models.CharField(max_length=200, blank=True, verbose_name="Descrição (Opcional)")
+    is_principal = models.BooleanField(default=False, verbose_name="Marcar como Foto Principal")
+    data_upload = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-is_principal', '-data_upload'] # Principais e mais recentes primeiro
+
+    def __str__(self):
+        return f"Foto de {self.poco.identificador_poco}"
+    
 # Modelo 3: Manutenção
 class Manutencao(models.Model):
     # --- RELACIONAMENTO E DADOS GERAIS ---

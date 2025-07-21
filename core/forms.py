@@ -2,21 +2,19 @@
 # core/forms.py
 
 from django import forms
-from .models import Poco, Cliente, Manutencao
+from .models import Poco, Cliente, Manutencao,FotoPoco
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Row, Column, Field, HTML
 from django.templatetags.static import static
 
-# Em core/forms.py
 
-# ... (outras importações e as classes ClienteForm, ManutencaoForm) ...
-
+# Classe PocoForm
 class PocoForm(forms.ModelForm):
     class Meta:
         model = Poco
         fields = [
             'cliente', 'identificador_poco', 'data_perfuração_inicial', 
-            'endereco_completo', 'cidade', 'estado', 'foto_principal', 'localizacao_mapa',
+            'endereco_completo', 'cidade', 'estado', 'localizacao_mapa',
             'profundidade_total', 'diametro_poco', 'profundidade_bomba', 
             'profundidade_injetor', 'cabo_eletrico', 'cabo_nautico', 
             'tubulacao_material', 'modelo_bomba_instalada', 'modelo_gerador', 
@@ -29,29 +27,20 @@ class PocoForm(forms.ModelForm):
                 attrs={'type': 'date'}
             ),
             'equipamento_assistencia': forms.Textarea(attrs={'rows': 4}),
-            # 'observacoes' não existe no modelo Poco, então removi para evitar erros
         }
 
     def __init__(self, *args, **kwargs):
+        empresa = kwargs.pop('empresa', None)
         super().__init__(*args, **kwargs)
+        if empresa:
+            self.fields['cliente'].queryset = Cliente.objects.filter(empresa=empresa)
         
-        # --- Lógica para definir a URL da imagem de preview ---
-        # Determina a URL ANTES de construir o layout.
-        if self.instance and self.instance.pk and self.instance.foto_principal:
-            placeholder_url = self.instance.foto_principal.url
-        else:
-            # Importa a função static aqui dentro para evitar problemas de importação circular
-            from django.templatetags.static import static
-            placeholder_url = static('img/poco-placeholder.jpg')
-        
-        # --- Configuração do Crispy Forms Helper ---
         self.helper = FormHelper(self)
         self.helper.form_tag = False
         self.helper.disable_csrf = True
         
-        # --- Layout Estruturado do Formulário (Versão Corrigida) ---
+        # Layout simplificado sem a foto
         self.helper.layout = Layout(
-            
             Row(
                 Column('cliente', css_class='form-group col-md-6 mb-0'),
                 Column('identificador_poco', css_class='form-group col-md-6 mb-0'),
@@ -59,40 +48,17 @@ class PocoForm(forms.ModelForm):
             'data_perfuração_inicial',
 
             HTML('<hr>'),
-            HTML('<h6 class="mt-3 mb-3 text-primary">Localização e Foto</h6>'),
+            HTML('<h6 class="mt-3 mb-3 text-primary">Localização</h6>'),
             
+            'endereco_completo',
+            'localizacao_mapa',
             Row(
-                Column(
-                    'endereco_completo',
-                    'localizacao_mapa',
-                    Row(
-                        Column('cidade', css_class='form-group col-md-6 mb-0'),
-                        Column('estado', css_class='form-group col-md-6 mb-0'),
-                    ),
-                    css_class='col-md-7'
-                ),
-                Column(
-                    # Usa a f-string para injetar a URL que calculamos acima
-                    HTML(f"""
-                        <div class="text-center">
-                            <label class="form-label">Foto Principal</label>
-                            <div class="mb-2">
-                                <img id="image-preview" 
-                                     src="{placeholder_url}"
-                                     alt="Preview da foto do poço" 
-                                     class="img-fluid rounded border" 
-                                     style="max-height: 150px; object-fit: cover;">
-                            </div>
-                        </div>
-                    """),
-                    'foto_principal', # Renderiza o campo de upload abaixo do preview
-                    css_class='col-md-5'
-                ),
+                Column('cidade', css_class='form-group col-md-6 mb-0'),
+                Column('estado', css_class='form-group col-md-6 mb-0'),
             ),
 
             HTML('<hr>'),
             HTML('<h6 class="mt-3 mb-3 text-primary">Dados de Instalação e Estrutura</h6>'),
-
             Row(
                 Column('profundidade_total', 'diametro_poco', 'profundidade_bomba', 'profundidade_injetor', css_class='form-group col-md-6 mb-0'),
                 Column('tubulacao_material', 'cabo_eletrico', 'cabo_nautico', 'modelo_bomba_instalada', css_class='form-group col-md-6 mb-0'),
@@ -100,7 +66,6 @@ class PocoForm(forms.ModelForm):
 
             HTML('<hr>'),
             HTML('<h6 class="mt-3 mb-3 text-primary">Equipamentos Elétricos</h6>'),
-
             Row(
                 Column('modelo_gerador', 'painel_comando', css_class='form-group col-md-4 mb-0'),
                 Column('fusivel_disjuntor', 'contator', css_class='form-group col-md-4 mb-0'),
@@ -112,6 +77,17 @@ class PocoForm(forms.ModelForm):
             'equipamento_assistencia',
         )
 # Fim da classe PocoForm
+
+class FotoPocoForm(forms.ModelForm):
+    class Meta:
+        model = FotoPoco
+        # Apenas os campos que o usuário preenche
+        fields = ['imagem', 'descricao']
+        widgets = {
+            'imagem': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'descricao': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Descrição (opcional)'}),
+        }
+
 
 # # Classe ClienteForm e ManutencaoForm         
 class ClienteForm(forms.ModelForm):

@@ -38,7 +38,45 @@
         <i class="bi bi-plus-circle"></i> Adicionar Manutenção
     </button>
 </div>
+    <!-- ===== INÍCIO DA SEÇÃO GALERIA DE FOTOS ===== -->
+    <div class="card mt-4">
+        <div class="card-header">
+            <h4>Galeria de Fotos</h4>
+        </div>
+        <div class="card-body">
+            <!-- Formulário de Upload -->
+            <form 
+                hx-post="{% url 'web:adicionar_foto_poco' poco.pk %}"
+                hx-target="#galeria-wrapper"
+                hx-swap="innerHTML"
+                enctype="multipart/form-data"
+                class="mb-4 border p-3 rounded bg-light"
+            >
+                {% csrf_token %}
+                <h5 class="mb-3">Adicionar Nova Foto</h5>
+                
+                {# Renderiza o formulário que passamos pela view #}
+                {{ foto_form.imagem }}
+                {{ foto_form.descricao }}
 
+                <button type="submit" class="btn btn-primary mt-2">
+                    <span class="htmx-indicator-reverse">Enviar Foto</span>
+                    <span class="htmx-indicator">
+                        <span class="spinner-border spinner-border-sm"></span> Enviando...
+                    </span>
+                </button>
+            </form>
+            <!-- Wrapper para a galeria que será atualizado pelo HTMX -->
+            <div id="galeria-wrapper"
+                hx-get="{% url 'web:partial_check_fotos' poco.pk %}" {# Nova URL de fragmento #}
+                hx-trigger="updateGaleria from:body"
+                hx-target="this"
+                hx-swap="innerHTML">
+                {% include 'core/partials/_galeria_fotos.html' %}
+            </div>        
+        </div>
+    </div>
+    <!-- ===== FIM DA SEÇÃO GALERIA DE FOTOS ===== -->
 <div id="tabela-manutencoes-wrapper"
     hx-get="{% url 'web:partial_check_manutencoes' poco.pk %}"
     hx-trigger="updateManutencaoList from:body"

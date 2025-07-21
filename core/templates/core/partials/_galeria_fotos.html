@@ -1,0 +1,52 @@
+<div class="row">
+    {% for foto in poco.fotos.all %}
+        <div class="col-md-4 mb-3">
+            <div class="card h-100 {% if foto.is_principal %}border-success border-2{% endif %}">
+                <a href="{{ foto.imagem.url }}" target="_blank">
+                    <img src="{{ foto.imagem.url }}" 
+                         class="card-img-top" 
+                         style="height: 200px; object-fit: contain; background-color: #f8f9fa;" 
+                         alt="{{ foto.descricao }}">
+                </a>
+                <div class="card-body d-flex flex-column">
+                    <p class="card-text flex-grow-1">{{ foto.descricao|default:"Sem descrição" }}</p>
+                </div>
+
+                {# O rodapé do card conterá todas as ações #}
+                <div class="card-footer bg-light d-flex justify-content-between align-items-center">
+                    
+                    {# Ação 1: Status ou Botão de Definir como Principal #}
+                    {% if foto.is_principal %}
+                        <span class="badge bg-success">
+                            <i class="bi bi-check-circle-fill"></i> Principal
+                        </span>
+                    {% else %}
+                        <form class="mb-0"
+                              hx-post="{% url 'web:definir_foto_principal' poco.pk foto.pk %}"
+                              hx-target="#galeria-wrapper"
+                              hx-swap="outerHTML">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-success">
+                                Definir como Principal
+                            </button>
+                        </form>
+                    {% endif %}
+
+                    {# Ação 2: Botão de Exclusão (agora fora de qualquer outro form) #}
+                    <button type="button" class="btn btn-sm btn-outline-danger"
+                            hx-get="{% url 'web:excluir_foto_poco' poco.pk foto.pk %}"
+                            hx-target="#modal-content"
+                            data-bs-toggle="modal" 
+                            data-bs-target="#modal">
+                        <i class="bi bi-trash"></i>
+                        Excluir Foto
+                    </button>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col">
+            <p class="text-muted">Nenhuma foto adicionada a este poço ainda.</p>
+        </div>
+    {% endfor %}
+</div>

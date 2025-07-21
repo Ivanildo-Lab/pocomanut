@@ -3,7 +3,7 @@
 from django.urls import path
 from django.contrib.auth.views import LogoutView
 from . import views # Importa o módulo de views para chamar a index_view
-from .views import dashboard_view
+from .views import dashboard_view,adicionar_foto_poco ,definir_foto_principal ,excluir_foto_poco, partial_check_fotos
 
 app_name = 'web'
 
@@ -26,7 +26,11 @@ urlpatterns = [
     path('pocos/<int:pk>/editar/', views.poco_create_update, name='poco_update'),
     path('pocos/<int:pk>/excluir/', views.poco_delete, name='poco_delete'),
     path('pocos/<int:pk>/pdf/', views.gerar_relatorio_pdf, name='gerar_pdf'),
-    
+    path('pocos/<int:poco_pk>/adicionar-foto/', adicionar_foto_poco, name='adicionar_foto_poco'),
+    path('pocos/<int:poco_pk>/fotos/<int:pk>/definir-principal/', definir_foto_principal, name='definir_foto_principal'),
+    path('pocos/<int:poco_pk>/fotos/<int:pk>/excluir/', excluir_foto_poco, name='excluir_foto_poco'),
+    path('pocos/<int:poco_pk>/check-fotos/', views.partial_check_fotos, name='partial_check_fotos'),
+
     # --- Detalhes do Poço e Manutenções ---
     path('pocos/<int:pk>/', views.PocoDetailView.as_view(), name='detalhes_poco'),
     path('pocos/<int:poco_pk>/check-manutencoes/', views.partial_check_manutencoes, name='partial_check_manutencoes'),
