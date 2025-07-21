@@ -47,10 +47,9 @@
                         {% if user.profile.empresa.logo %}
                             <img src="{{ user.profile.empresa.logo.url }}" 
                                 alt="Logo da Empresa" 
-                                class="rounded-circle me-2" 
-                                width="24" 
-                                height="24"
-                                style="object-fit: cover;">
+                                class="rounded-circle me-3" {# Aumentei a margem para me-3 #}
+                                height="40" {# Definimos apenas a altura, a largura se ajustará #}
+                                style="object-fit: cover; aspect-ratio: 1/1;">
                         {% endif %}
                         <div>
                             <small class="d-block text-white-50 lh-1">{{ user.profile.empresa.nome_fantasia }}</small>
