@@ -36,8 +36,7 @@
                     <button type="button" class="btn btn-sm btn-outline-danger"
                             hx-get="{% url 'web:excluir_foto_poco' poco.pk foto.pk %}"
                             hx-target="#modal-content"
-                            data-bs-toggle="modal" 
-                            data-bs-target="#modal">
+                            hx-on::after-request="bootstrap.Modal.getOrCreateInstance(document.getElementById('modal')).show()">
                         <i class="bi bi-trash"></i>
                         Excluir Foto
                     </button>

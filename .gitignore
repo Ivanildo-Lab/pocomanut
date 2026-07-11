@@ -23,3 +23,11 @@ local_settings.py
 # Arquivos de IDEs (ex: VS Code, PyCharm)
 .vscode/
 .idea/
+
+# Logs do servidor
+server.log
+server_stdout.log
+server_stderr.log
+
+# Dump do banco de dados
+*.sql

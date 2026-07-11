@@ -1,0 +1,31 @@
+<div class="modal-header">
+    <h5 class="modal-title">Confirmar Exclusão</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+</div>
+<div class="modal-body">
+    <div class="alert alert-danger">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-triangle me-2" viewBox="0 0 16 16">
+            <path d="M7.938 2.012A.5.5 0 0 1 8.5 2.5v1a.5.5 0 0 1-.565.496l-.994-.274-.051.002A.5.5 0 0 1 7.5 4H7a.5.5 0 0 1 0-1h.5a.5.5 0 0 1 .438.256l.994-.274.051-.002A.5.5 0 0 1 8.5 3v-1a.5.5 0 0 1 .5-.5zm.5 6.5a.5.5 0 0 0-1 0v2a.5.5 0 0 0 1 0v-2zM8 10a.5.5 0 0 0-.5.5v2a.5.5 0 0 0 1 0v-2A.5.5 0 0 0 8 10z"/>
+            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.399l-.286.001-.178-.413.527-.115A.5.5 0 0 1 8 6.5c.396 0 .724-.316.8-.71l.128-.608h-.67a.5.5 0 0 0 0 1h.495l-.036.543a.5.5 0 0 0 .5.5H9.5a.5.5 0 0 0 0-1h-.403l.044-.086zM4.5 8a.5.5 0 0 1 .5-.5h.536a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5z"/>
+        </svg>
+        Tem certeza que deseja excluir a bomba <strong>{{ bomba.descricao }}</strong>?
+    </div>
+    <p class="text-muted">
+        <small>Modelo: {{ bomba.modelo }} | Marca: {{ bomba.marca }}</small>
+    </p>
+    <p class="text-danger">
+        <small>Esta ação não pode ser desfeita.</small>
+    </p>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+    <form 
+        hx-post="{% url 'web:bomba_delete' pk=bomba.pk %}"
+        hx-target="#modal-content"
+        hx-swap="innerHTML"
+        class="d-inline"
+    >
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Excluir Bomba</button>
+    </form>
+</div>

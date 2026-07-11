@@ -3,14 +3,16 @@
 from django.urls import path
 from django.contrib.auth.views import LogoutView
 from . import views # Importa o módulo de views para chamar a index_view
-from .views import dashboard_view,adicionar_foto_poco ,definir_foto_principal ,excluir_foto_poco, partial_check_fotos
+from .views import (dashboard_view, adicionar_foto_poco, definir_foto_principal, 
+                    excluir_foto_poco, partial_check_fotos, adicionar_foto_bomba,
+                    definir_foto_principal_bomba, excluir_foto_bomba, partial_check_fotos_bomba,
+                    funcionario_create_update)
 
 app_name = 'web'
 
 urlpatterns = [
     # --- Rota Raiz e Autenticação ---
-    # A raiz do site agora aponta para a nossa view de redirecionamento
-    path('', dashboard_view, name='dashboard'), # Rota para o dashboard
+    path('', dashboard_view, name='dashboard'),
     path('login/', views.CustomLoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
 
@@ -37,4 +39,35 @@ urlpatterns = [
     path('pocos/<int:poco_pk>/manutencoes/nova/', views.manutencao_create_update, name='manutencao_create'),
     path('pocos/<int:poco_pk>/manutencoes/<int:pk>/editar/', views.manutencao_create_update, name='manutencao_update'),
     path('pocos/<int:poco_pk>/manutencoes/<int:pk>/excluir/', views.manutencao_delete, name='manutencao_delete'),
+
+    # --- Módulo de Bombas ---
+    path('bombas/', views.BombaListView.as_view(), name='lista_bombas'),
+    path('bombas/nova/', views.bomba_create_update, name='bomba_create'),
+    path('bombas/<int:pk>/editar/', views.bomba_create_update, name='bomba_update'),
+    path('bombas/<int:pk>/excluir/', views.bomba_delete, name='bomba_delete'),
+    path('bombas/<int:bomba_pk>/adicionar-foto/', adicionar_foto_bomba, name='adicionar_foto_bomba'),
+    path('bombas/<int:bomba_pk>/fotos/<int:pk>/definir-principal/', definir_foto_principal_bomba, name='definir_foto_principal_bomba'),
+    path('bombas/<int:bomba_pk>/fotos/<int:pk>/excluir/', excluir_foto_bomba, name='excluir_foto_bomba'),
+    path('bombas/<int:bomba_pk>/check-fotos/', views.partial_check_fotos_bomba, name='partial_check_fotos_bomba'),
+
+    # --- Módulo de Ordens de Serviço ---
+    path('ordens-servico/', views.OrdemServicoListView.as_view(), name='lista_os'),
+    path('ordens-servico/nova/', views.os_create_update, name='os_create'),
+    path('ordens-servico/<int:pk>/editar/', views.os_create_update, name='os_update'),
+    path('ordens-servico/<int:pk>/excluir/', views.os_delete, name='os_delete'),
+    path('ordens-servico/<int:pk>/', views.OrdemServicoDetailView.as_view(), name='detalhes_os'),
+    path('ordens-servico/<int:pk>/atualizar-status/', views.os_atualizar_status, name='os_atualizar_status'),
+    path('ordens-servico/<int:pk>/pdf/', views.gerar_os_pdf, name='gerar_os_pdf'),
+    path('ordens-servico/<int:os_pk>/itens/adicionar/', views.item_os_add, name='item_os_add'),
+    path('ordens-servico/<int:os_pk>/itens/<int:pk>/excluir/', views.item_os_delete, name='item_os_delete'),
+    path('ordens-servico/<int:os_pk>/orcamento/', views.orcamento_update, name='orcamento_update'),
+    path('ordens-servico/<int:os_pk>/orcamento/aprovar/', views.orcamento_aprovar, name='orcamento_aprovar'),
+    path('ordens-servico/<int:os_pk>/fotos/adicionar/', views.foto_movimentacao_add, name='foto_movimentacao_add'),
+    path('ordens-servico/<int:os_pk>/fotos/<int:pk>/excluir/', views.foto_movimentacao_delete, name='foto_movimentacao_delete'),
+
+    # --- Módulo de Funcionários ---
+    path('funcionarios/', views.FuncionarioListView.as_view(), name='lista_funcionarios'),
+    path('funcionarios/novo/', views.funcionario_create_update, name='funcionario_create'),
+    path('funcionarios/<int:pk>/editar/', views.funcionario_create_update, name='funcionario_update'),
+    path('funcionarios/<int:pk>/excluir/', views.funcionario_delete, name='funcionario_delete'),
 ]

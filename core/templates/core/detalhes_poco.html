@@ -33,8 +33,7 @@
     <button class="btn btn-primary"
         hx-get="{% url 'web:manutencao_create' poco.pk %}"
         hx-target="#modal-content"
-        data-bs-toggle="modal"
-        data-bs-target="#modal">
+        hx-on::after-request="bootstrap.Modal.getOrCreateInstance(document.getElementById('modal')).show()">
         <i class="bi bi-plus-circle"></i> Adicionar Manutenção
     </button>
 </div>

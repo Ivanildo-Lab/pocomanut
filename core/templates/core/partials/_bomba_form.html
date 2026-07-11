@@ -1,0 +1,87 @@
+{% load crispy_forms_tags %}
+
+<div class="modal-header">
+    <h5 class="modal-title">
+        {% if instance %}Editar Bomba{% else %}Nova Bomba{% endif %}
+    </h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+</div>
+<div class="modal-body">
+    <form 
+        hx-post="{% if instance %}{% url 'web:bomba_update' pk=instance.pk %}{% else %}{% url 'web:bomba_create' %}{% endif %}"
+        hx-target="#modal-content"
+        hx-swap="innerHTML"
+        enctype="multipart/form-data"
+    >
+        {% csrf_token %}
+        {{ form|crispy }}
+        
+        {% if instance %}
+        <hr>
+        <h6 class="text-primary mb-3">Fotos da Bomba</h6>
+        
+        {% if instance.fotos.all %}
+        <div class="row g-2 mb-3">
+            {% for foto in instance.fotos.all %}
+            <div class="col-4 col-md-3">
+                <div class="position-relative">
+                    <img src="{{ foto.imagem.url }}" class="rounded w-100" 
+                         style="height: 80px; object-fit: cover; cursor: pointer;"
+                         onclick="abrirImagem('{{ foto.imagem.url }}', '{{ foto.descricao|default:instance.descricao }}')"
+                         alt="{{ foto.descricao }}">
+                    {% if foto.is_principal %}
+                        <span class="badge bg-primary position-absolute top-0 start-0" style="font-size: 0.6rem;">Principal</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <div class="mb-3">
+            <label class="form-label fw-bold">Adicionar nova foto</label>
+            <input type="file" name="foto_imagem" class="form-control" accept="image/*" 
+                   id="foto-input" onchange="previewFoto(this)">
+            <div id="foto-preview-container" class="mt-2" style="display: none;">
+                <img id="foto-preview" src="" class="rounded" style="max-height: 150px; border: 2px solid #dee2e6;">
+                <button type="button" class="btn btn-sm btn-outline-danger mt-1" onclick="limparPreview()">Remover</button>
+            </div>
+        </div>
+        {% else %}
+        <hr>
+        <h6 class="text-primary mb-3">Foto da Bomba (Opcional)</h6>
+        <div class="mb-3">
+            <input type="file" name="foto_imagem" class="form-control" accept="image/*"
+                   id="foto-input" onchange="previewFoto(this)">
+            <div id="foto-preview-container" class="mt-2" style="display: none;">
+                <img id="foto-preview" src="" class="rounded" style="max-height: 150px; border: 2px solid #dee2e6;">
+                <button type="button" class="btn btn-sm btn-outline-danger mt-1" onclick="limparPreview()">Remover</button>
+            </div>
+        </div>
+        {% endif %}
+        
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">
+                {% if instance %}Salvar Alterações{% else %}Criar Bomba{% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+function previewFoto(input) {
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('foto-preview').src = e.target.result;
+            document.getElementById('foto-preview-container').style.display = 'block';
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+function limparPreview() {
+    document.getElementById('foto-input').value = '';
+    document.getElementById('foto-preview-container').style.display = 'none';
+}
+</script>

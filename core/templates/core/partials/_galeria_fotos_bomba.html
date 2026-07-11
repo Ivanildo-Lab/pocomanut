@@ -1,0 +1,69 @@
+<div class="card mb-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h6 class="mb-0">Galeria de Fotos - {{ bomba.descricao }}</h6>
+        <button type="button" class="btn btn-sm btn-primary"
+            hx-get="{% url 'web:adicionar_foto_bomba' bomba_pk=bomba.pk %}"
+            hx-target="#modal-content"
+            hx-swap="innerHTML"
+            hx-on::after-request="bootstrap.Modal.getOrCreateInstance(document.getElementById('modal')).show()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+            </svg>
+            Adicionar Foto
+        </button>
+    </div>
+    <div class="card-body">
+        {% if bomba.fotos.all %}
+        <div class="row g-3">
+            {% for foto in bomba.fotos.all %}
+            <div class="col-md-4 col-lg-3">
+                <div class="card h-100">
+                    <img src="{{ foto.imagem.url }}" class="card-img-top" alt="{{ foto.descricao }}" 
+                         style="height: 150px; object-fit: cover;">
+                    <div class="card-body p-2">
+                        <p class="card-text small text-muted mb-1">
+                            {{ foto.descricao|default:"Sem descrição" }}
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            {% if foto.is_principal %}
+                                <span class="badge bg-primary">Principal</span>
+                            {% else %}
+                                <button type="button" class="btn btn-sm btn-outline-primary"
+                                    hx-post="{% url 'web:definir_foto_principal_bomba' bomba_pk=bomba.pk pk=foto.pk %}"
+                                    hx-target="#galeria-fotos-bomba"
+                                    hx-swap="innerHTML"
+                                    title="Definir como principal">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                                        <path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.565.565 0 0 0-.183-.547L3.791 8.588l3.93-.568a.565.565 0 0 0 .438-.383L8 3.372l-.252 4.654a.565.565 0 0 0 .438.383l3.93.568-2.857 2.864a.565.565 0 0 0-.183.547l.694 3.957-3.686-1.894a.565.565 0 0 0-.515 0z"/>
+                                    </svg>
+                                </button>
+                            {% endif %}
+                            <button type="button" class="btn btn-sm btn-outline-danger"
+                                hx-get="{% url 'web:excluir_foto_bomba' bomba_pk=bomba.pk pk=foto.pk %}"
+                                hx-target="#modal-content"
+                                hx-swap="innerHTML"
+                                hx-on::after-request="bootstrap.Modal.getOrCreateInstance(document.getElementById('modal')).show()"
+                                title="Excluir foto">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                    <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center text-muted py-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-image mb-3" viewBox="0 0 16 16">
+                <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                <path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z"/>
+            </svg>
+            <p>Nenhuma foto cadastrada para esta bomba.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>

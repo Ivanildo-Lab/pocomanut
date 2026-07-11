@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Lista de Bombas - PocoManut{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Lista de Bombas Cadastradas</h1>
+    
+    <button type="button" class="btn btn-primary"
+        hx-get="{% url 'web:bomba_create' %}"
+        hx-target="#modal-content"
+        hx-swap="innerHTML"
+        hx-on::after-request="bootstrap.Modal.getOrCreateInstance(document.getElementById('modal')).show()">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
+            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"/>
+        </svg>
+        Nova Bomba
+    </button>
+</div>
+
+<div class="mb-4">
+    <input 
+        type="search" 
+        name="q" 
+        class="form-control" 
+        placeholder="Digite para buscar por descrição, modelo ou marca..."
+        hx-get="{% url 'web:lista_bombas' %}"
+        hx-trigger="keyup changed delay:500ms, search"
+        hx-target="#tabela-bombas-wrapper"
+        hx-swap="innerHTML"
+        hx-indicator="#loading-indicator-bombas"
+    >
+    <div id="loading-indicator-bombas" class="htmx-indicator">
+        <div class="spinner-border spinner-border-sm" role="status">
+            <span class="visually-hidden">Buscando...</span>
+        </div> 
+        Buscando...
+    </div>
+</div>
+
+<div 
+    id="tabela-bombas-wrapper" 
+    hx-get="{% url 'web:lista_bombas' %}" 
+    hx-trigger="updateBombaList from:body"
+    hx-target="this"
+    hx-swap="innerHTML"
+>
+    {% include 'core/partials/lista_bombas_tabela.html' %}
+</div>
+{% endblock %}

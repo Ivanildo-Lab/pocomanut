@@ -1,0 +1,95 @@
+{% if bombas %}
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Foto</th>
+                <th>Descrição</th>
+                <th>Modelo</th>
+                <th>Marca</th>
+                <th>Potência</th>
+                <th>Voltagem</th>
+                <th>Reserva</th>
+                <th>Proprietário</th>
+                <th>Status</th>
+                <th class="text-center">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for bomba in bombas %}
+            <tr>
+                <td>
+                    {% with foto=bomba.get_foto_principal %}
+                        {% if foto %}
+                            <img src="{{ foto.imagem.url }}" alt="{{ bomba.descricao }}" 
+                                 class="rounded" style="width: 50px; height: 50px; object-fit: cover; cursor: pointer;"
+                                 onclick="abrirImagem('{{ foto.imagem.url }}', '{{ bomba.descricao }}')">
+                        {% else %}
+                            <div class="bg-secondary bg-opacity-25 rounded d-flex align-items-center justify-content-center" 
+                                 style="width: 50px; height: 50px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="text-muted" viewBox="0 0 16 16">
+                                    <path d="M4 11H2v3h2v-3zm5-4v7H7v-7h2zm5 0v7h-2v-7h2zM2 9V7h12v2H2zm14-1V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v1h12zM1 4v1h1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1h1zm0 3v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7H1z"/>
+                                </svg>
+                            </div>
+                        {% endif %}
+                    {% endwith %}
+                </td>
+                <td>{{ bomba.descricao }}</td>
+                <td>{{ bomba.modelo }}</td>
+                <td>{{ bomba.marca }}</td>
+                <td>{{ bomba.potencia }} HP</td>
+                <td>{{ bomba.get_voltagem_display }}</td>
+                <td>
+                    {% if bomba.is_reserva %}
+                        <span class="badge bg-info">Reserva</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Própria</span>
+                    {% endif %}
+                </td>
+                <td>{{ bomba.cliente_proprietario.nome_razao_social|default:"-" }}</td>
+                <td>
+                    {% if bomba.status == 'disponivel' %}
+                        <span class="badge bg-success">Disponível</span>
+                    {% elif bomba.status == 'em_uso' %}
+                        <span class="badge bg-warning text-dark">Em Uso</span>
+                    {% elif bomba.status == 'manutencao' %}
+                        <span class="badge bg-danger">Manutenção</span>
+                    {% endif %}
+                </td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-sm btn-outline-primary"
+                        hx-get="{% url 'web:bomba_update' pk=bomba.pk %}"
+                        hx-target="#modal-content"
+                        hx-swap="innerHTML"
+                        hx-on::after-request="bootstrap.Modal.getOrCreateInstance(document.getElementById('modal')).show()"
+                        title="Editar">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                        </svg>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-danger"
+                        hx-get="{% url 'web:bomba_delete' pk=bomba.pk %}"
+                        hx-target="#modal-content"
+                        hx-swap="innerHTML"
+                        hx-on::after-request="bootstrap.Modal.getOrCreateInstance(document.getElementById('modal')).show()"
+                        title="Excluir">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                            <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                        </svg>
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="alert alert-info">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle me-2" viewBox="0 0 16 16">
+        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+        <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+    </svg>
+    Nenhuma bomba cadastrada. Clique em "Nova Bomba" para começar.
+</div>
+{% endif %}

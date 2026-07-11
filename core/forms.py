@@ -2,7 +2,9 @@
 # core/forms.py
 
 from django import forms
-from .models import Poco, Cliente, Manutencao,FotoPoco
+from django.contrib.auth.models import User
+from django.db.models import Q
+from .models import Poco, Cliente, Manutencao, FotoPoco, Bomba, FotoBomba, OrdemServico, ItemOS, Orcamento, FotoMovimentacao, Funcionario
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Row, Column, Field, HTML
 from django.templatetags.static import static
@@ -134,5 +136,201 @@ class ManutencaoForm(forms.ModelForm):
         self.helper.disable_csrf = True
 
 
+# ============================================================
+# FORMULÁRIOS - SISTEMA DE ORDEM DE SERVIÇO E BOMBAS
+# ============================================================
 
+class BombaForm(forms.ModelForm):
+    class Meta:
+        model = Bomba
+        fields = ['descricao', 'modelo', 'marca', 'potencia', 'voltagem', 'numero_nota_fiscal', 
+                  'is_reserva', 'cliente_proprietario', 'status', 'ativo']
+    
+    def __init__(self, *args, **kwargs):
+        empresa = kwargs.pop('empresa', None)
+        super().__init__(*args, **kwargs)
+        if empresa:
+            self.fields['cliente_proprietario'].queryset = Cliente.objects.filter(empresa=empresa)
         
+        self.helper = FormHelper(self)
+        self.helper.form_tag = False
+        self.helper.disable_csrf = True
+        
+        self.helper.layout = Layout(
+            HTML('<h6 class="mt-2 mb-3 text-primary">Dados da Bomba</h6>'),
+            'descricao',
+            Row(
+                Column('modelo', css_class='form-group col-md-6 mb-0'),
+                Column('marca', css_class='form-group col-md-6 mb-0'),
+            ),
+            Row(
+                Column('potencia', css_class='form-group col-md-4 mb-0'),
+                Column('voltagem', css_class='form-group col-md-4 mb-0'),
+                Column('numero_nota_fiscal', css_class='form-group col-md-4 mb-0'),
+            ),
+            HTML('<hr>'),
+            HTML('<h6 class="mt-2 mb-3 text-primary">Controle e Propriedade</h6>'),
+            Row(
+                Column('is_reserva', css_class='form-group col-md-4 mb-0'),
+                Column('status', css_class='form-group col-md-4 mb-0'),
+                Column('ativo', css_class='form-group col-md-4 mb-0'),
+            ),
+            'cliente_proprietario',
+        )
+
+
+class FotoBombaForm(forms.ModelForm):
+    class Meta:
+        model = FotoBomba
+        fields = ['imagem', 'descricao']
+        widgets = {
+            'imagem': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'descricao': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Descrição (opcional)'}),
+        }
+
+
+class OrdemServicoForm(forms.ModelForm):
+    class Meta:
+        model = OrdemServico
+        fields = [
+            'cliente', 'poco', 'bomba', 'prioridade', 
+            'data_previsao_entrega', 'data_entrada', 'data_saida',
+            'funcionario_responsavel', 'observacoes'
+        ]
+        widgets = {
+            'data_previsao_entrega': forms.DateInput(
+                format='%Y-%m-%d',
+                attrs={'type': 'date'}
+            ),
+            'data_entrada': forms.DateTimeInput(
+                format='%Y-%m-%dT%H:%M',
+                attrs={'type': 'datetime-local'}
+            ),
+            'data_saida': forms.DateTimeInput(
+                format='%Y-%m-%dT%H:%M',
+                attrs={'type': 'datetime-local'}
+            ),
+            'observacoes': forms.Textarea(attrs={'rows': 3}),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        empresa = kwargs.pop('empresa', None)
+        super().__init__(*args, **kwargs)
+        if empresa:
+            self.fields['cliente'].queryset = Cliente.objects.filter(empresa=empresa)
+            self.fields['poco'].queryset = Poco.objects.filter(cliente__empresa=empresa)
+            self.fields['bomba'].queryset = Bomba.objects.filter(empresa=empresa)
+            self.fields['funcionario_responsavel'].queryset = Funcionario.objects.filter(empresa=empresa, ativo=True)
+        
+        self.helper = FormHelper(self)
+        self.helper.form_tag = False
+        self.helper.disable_csrf = True
+        
+        self.helper.layout = Layout(
+            HTML('<h6 class="mt-2 mb-3 text-primary">Dados da Ordem de Serviço</h6>'),
+            Row(
+                Column('cliente', css_class='form-group col-md-6 mb-0'),
+                Column('poco', css_class='form-group col-md-6 mb-0'),
+            ),
+            Row(
+                Column('bomba', css_class='form-group col-md-6 mb-0'),
+                Column('prioridade', css_class='form-group col-md-6 mb-0'),
+            ),
+            Row(
+                Column('data_previsao_entrega', css_class='form-group col-md-4 mb-0'),
+                Column('funcionario_responsavel', css_class='form-group col-md-8 mb-0'),
+            ),
+            HTML('<hr>'),
+            HTML('<h6 class="mt-2 mb-3 text-primary">Controle de Datas</h6>'),
+            Row(
+                Column('data_entrada', css_class='form-group col-md-6 mb-0'),
+                Column('data_saida', css_class='form-group col-md-6 mb-0'),
+            ),
+            'observacoes',
+        )
+
+
+class ItemOSForm(forms.ModelForm):
+    class Meta:
+        model = ItemOS
+        fields = ['descricao', 'quantidade', 'valor_unitario']
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.form_tag = False
+        self.helper.disable_csrf = True
+        
+        self.helper.layout = Layout(
+            Row(
+                Column('descricao', css_class='form-group col-md-5 mb-0'),
+                Column('quantidade', css_class='form-group col-md-2 mb-0'),
+                Column('valor_unitario', css_class='form-group col-md-3 mb-0'),
+                css_class='align-items-end'
+            ),
+        )
+
+
+class OrcamentoForm(forms.ModelForm):
+    class Meta:
+        model = Orcamento
+        fields = ['observacoes']
+        widgets = {
+            'observacoes': forms.Textarea(attrs={'rows': 3}),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.form_tag = False
+        self.helper.disable_csrf = True
+        
+        self.helper.layout = Layout(
+            'observacoes',
+        )
+
+
+class FotoMovimentacaoForm(forms.ModelForm):
+    class Meta:
+        model = FotoMovimentacao
+        fields = ['imagem', 'descricao', 'tipo_foto']
+        widgets = {
+            'imagem': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'descricao': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Descrição (opcional)'}),
+            'tipo_foto': forms.Select(attrs={'class': 'form-select'}),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.form_tag = False
+        self.helper.disable_csrf = True
+
+
+class FuncionarioForm(forms.ModelForm):
+    class Meta:
+        model = Funcionario
+        fields = ['nome_completo', 'cpf', 'cargo', 'telefone', 'email', 'ativo']
+        widgets = {
+            'cpf': forms.TextInput(attrs={'placeholder': '000.000.000-00'}),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.form_tag = False
+        self.helper.disable_csrf = True
+        
+        self.helper.layout = Layout(
+            HTML('<h6 class="mt-2 mb-3 text-primary">Dados do Funcionário</h6>'),
+            'nome_completo',
+            Row(
+                Column('cpf', css_class='form-group col-md-6 mb-0'),
+                Column('cargo', css_class='form-group col-md-6 mb-0'),
+            ),
+            Row(
+                Column('telefone', css_class='form-group col-md-6 mb-0'),
+                Column('email', css_class='form-group col-md-6 mb-0'),
+            ),
+            'ativo',
+        )

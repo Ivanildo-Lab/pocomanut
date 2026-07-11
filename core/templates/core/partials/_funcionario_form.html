@@ -1,0 +1,25 @@
+{% load crispy_forms_tags %}
+
+<div class="modal-header">
+    <h5 class="modal-title">
+        {% if instance %}Editar Funcionário{% else %}Novo Funcionário{% endif %}
+    </h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+</div>
+<div class="modal-body">
+    <form 
+        hx-post="{% if instance %}{% url 'web:funcionario_update' pk=instance.pk %}{% else %}{% url 'web:funcionario_create' %}{% endif %}"
+        hx-target="#modal-content"
+        hx-swap="innerHTML"
+    >
+        {% csrf_token %}
+        {{ form|crispy }}
+        
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">
+                {% if instance %}Salvar Alterações{% else %}Cadastrar Funcionário{% endif %}
+            </button>
+        </div>
+    </form>
+</div>

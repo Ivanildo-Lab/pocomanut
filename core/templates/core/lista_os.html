@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Ordens de Serviço - PocoManut{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Ordens de Serviço</h1>
+    
+    <button type="button" class="btn btn-primary"
+        hx-get="{% url 'web:os_create' %}"
+        hx-target="#modal-content"
+        hx-swap="innerHTML"
+        hx-on::after-request="bootstrap.Modal.getOrCreateInstance(document.getElementById('modal')).show()">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
+            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"/>
+        </svg>
+        Nova OS
+    </button>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-8">
+        <input 
+            type="search" 
+            name="q" 
+            class="form-control" 
+            placeholder="Buscar por nº OS ou cliente..."
+            hx-get="{% url 'web:lista_os' %}"
+            hx-trigger="keyup changed delay:500ms, search"
+            hx-target="#tabela-os-wrapper"
+            hx-swap="innerHTML"
+            hx-include="[name='status']"
+            hx-indicator="#loading-indicator-os"
+        >
+    </div>
+    <div class="col-md-4">
+        <select 
+            name="status" 
+            class="form-select"
+            hx-get="{% url 'web:lista_os' %}"
+            hx-trigger="change"
+            hx-target="#tabela-os-wrapper"
+            hx-swap="innerHTML"
+            hx-include="[name='q']"
+        >
+            <option value="">Todos os Status</option>
+            <option value="aberta">Aberta</option>
+            <option value="em_andamento">Em Andamento</option>
+            <option value="aguardando_peca">Aguardando Peça</option>
+            <option value="concluida">Concluída</option>
+            <option value="cancelada">Cancelada</option>
+        </select>
+    </div>
+</div>
+
+<div id="loading-indicator-os" class="htmx-indicator mb-3">
+    <div class="spinner-border spinner-border-sm" role="status">
+        <span class="visually-hidden">Buscando...</span>
+    </div> 
+    Buscando...
+</div>
+
+<div 
+    id="tabela-os-wrapper" 
+    hx-get="{% url 'web:lista_os' %}" 
+    hx-trigger="updateOSList from:body"
+    hx-target="this"
+    hx-swap="innerHTML"
+>
+    {% include 'core/partials/lista_os_tabela.html' %}
+</div>
+{% endblock %}

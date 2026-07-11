@@ -1,0 +1,374 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ os.numero_os }} - Detalhes da OS - PocoManut{% endblock %}
+
+{% block content %}
+<div id="os-detail-wrapper"
+    hx-get="{% url 'web:detalhes_os' pk=os.pk %}"
+    hx-trigger="updateOSDetail from:body"
+    hx-target="this"
+    hx-swap="innerHTML"
+>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="mb-0">{{ os.numero_os }}</h1>
+        <small class="text-muted">Criado em {{ os.data_abertura|date:"d/m/Y H:i" }}</small>
+    </div>
+    <div>
+        <a href="{% url 'web:lista_os' %}" class="btn btn-outline-secondary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+            </svg>
+            Voltar
+        </a>
+        <button type="button" class="btn btn-primary"
+            hx-get="{% url 'web:os_update' pk=os.pk %}"
+            hx-target="#modal-content"
+            hx-swap="innerHTML"
+            hx-on::after-request="bootstrap.Modal.getOrCreateInstance(document.getElementById('modal')).show()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+                <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+            </svg>
+            Editar
+        </button>
+        <a href="{% url 'web:gerar_os_pdf' pk=os.pk %}" target="_blank" class="btn btn-info">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-pdf" viewBox="0 0 16 16">
+                <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
+                <path d="M4.603 14.087a.8.8 0 0 1-.438-.42c-.195-.388-.13-.776.08-1.102.198-.307.526-.568.897-.787a7.7 7.7 0 0 1 1.482-.645 20 20 0 0 0 1.062-2.231 7.3 7.3 0 0 1-.43-1.295c-.086-.4-.119-.796-.046-1.136.075-.354.274-.672.65-.823.192-.077.4-.12.602-.077a.7.7 0 0 1 .477.365c.088.164.12.356.127.538.007.188-.012.396-.047.614-.084.51-.27 1.134-.52 1.794a11 11 0 0 0 .98 1.686 5.8 5.8 0 0 1 1.334.05c.364.066.734.195.96.465.12.144.193.32.2.518.007.192-.047.382-.138.563a1.04 1.04 0 0 1-.37.197zM6.678 10.17c.227-.558.64-.963 1.06-1.204.446-.254.968-.353 1.455-.29a2.5 2.5 0 0 1 1.043.429c.29.24.476.547.56.876a2 2 0 0 1-.19.717c-.136.226-.31.414-.513.557a2.5 2.5 0 0 1-.963.392 4.5 4.5 0 0 1-1.39.07c-.36-.007-.723-.06-1.07-.17a2 2 0 0 1-.785-.488 1.7 1.7 0 0 1-.455-.626c-.04-.12-.06-.243-.06-.368 0-.112.024-.224.07-.33a1.2 1.2 0 0 1 .365-.358c.222-.137.505-.225.81-.271a3.5 3.5 0 0 1 .956-.07z"/>
+            </svg>
+            Imprimir PDF
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Dados da Ordem de Serviço</h5>
+                <div>
+                    {% if os.status == 'aberta' %}
+                        <span class="badge bg-primary fs-6">Aberta</span>
+                    {% elif os.status == 'em_andamento' %}
+                        <span class="badge bg-warning text-dark fs-6">Em Andamento</span>
+                    {% elif os.status == 'aguardando_peca' %}
+                        <span class="badge bg-info fs-6">Aguardando Peça</span>
+                    {% elif os.status == 'concluida' %}
+                        <span class="badge bg-success fs-6">Concluída</span>
+                    {% elif os.status == 'cancelada' %}
+                        <span class="badge bg-danger fs-6">Cancelada</span>
+                    {% endif %}
+                    
+                    {% if os.prioridade == 'urgente' %}
+                        <span class="badge bg-danger ms-2">Urgente</span>
+                    {% elif os.prioridade == 'alta' %}
+                        <span class="badge bg-warning text-dark ms-2">Alta</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Cliente:</strong> {{ os.cliente.nome_razao_social }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Poço:</strong> {{ os.poco.identificador_poco|default:"Não informado" }}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Bomba:</strong> 
+                        {% if os.bomba %}
+                            {{ os.bomba.descricao }} - {{ os.bomba.marca }} {{ os.bomba.modelo }}
+                            {% if os.bomba.is_reserva %}
+                                <span class="badge bg-info ms-1">Reserva</span>
+                            {% endif %}
+                            {% if os.bomba.cliente_proprietario %}
+                                <br><small class="text-muted">Proprietário: {{ os.bomba.cliente_proprietario.nome_razao_social }}</small>
+                            {% endif %}
+                        {% else %}
+                            Não informada
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Responsável:</strong> {{ os.funcionario_responsavel.nome_completo|default:"Não informado" }}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Previsão de Entrega:</strong> 
+                        {% if os.data_previsao_entrega %}
+                            {{ os.data_previsao_entrega|date:"d/m/Y" }}
+                        {% else %}
+                            <span class="text-muted">Não definida</span>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Data de Conclusão:</strong> 
+                        {% if os.data_conclusao %}
+                            {{ os.data_conclusao|date:"d/m/Y H:i" }}
+                        {% else %}
+                            <span class="text-muted">Em aberto</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Data/Hora de Entrada:</strong> 
+                        {% if os.data_entrada %}
+                            {{ os.data_entrada|date:"d/m/Y H:i" }}
+                        {% else %}
+                            <span class="text-muted">Não registrada</span>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Data/Hora de Saída:</strong> 
+                        {% if os.data_saida %}
+                            {{ os.data_saida|date:"d/m/Y H:i" }}
+                        {% else %}
+                            <span class="text-muted">Não registrada</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% if os.observacoes %}
+                <div class="mt-3">
+                    <strong>Observações:</strong>
+                    <p class="text-muted mb-0">{{ os.observacoes }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Atualizar Status</h5>
+            </div>
+            <div class="card-body">
+                <form 
+                    hx-post="{% url 'web:os_atualizar_status' pk=os.pk %}"
+                    hx-target="#os-detail-wrapper"
+                    hx-swap="innerHTML"
+                    class="d-flex gap-2"
+                >
+                    {% csrf_token %}
+                    <select name="status" class="form-select" style="width: auto;">
+                        <option value="aberta" {% if os.status == 'aberta' %}selected{% endif %}>Aberta</option>
+                        <option value="em_andamento" {% if os.status == 'em_andamento' %}selected{% endif %}>Em Andamento</option>
+                        <option value="aguardando_peca" {% if os.status == 'aguardando_peca' %}selected{% endif %}>Aguardando Peça</option>
+                        <option value="concluida" {% if os.status == 'concluida' %}selected{% endif %}>Concluída</option>
+                        <option value="cancelada" {% if os.status == 'cancelada' %}selected{% endif %}>Cancelada</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary">Atualizar</button>
+                </form>
+            </div>
+        </div>
+
+        {% if os.bomba %}
+        <div id="galeria-fotos-bomba"
+            hx-get="{% url 'web:partial_check_fotos_bomba' bomba_pk=os.bomba.pk %}"
+            hx-trigger="updateGaleriaBomba from:body"
+            hx-target="this"
+            hx-swap="innerHTML"
+        >
+            {% include 'core/partials/_galeria_fotos_bomba.html' with bomba=os.bomba %}
+        </div>
+        {% endif %}
+
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Itens / Peças Utilizadas</h5>
+                <button type="button" class="btn btn-sm btn-primary"
+                    hx-get="{% url 'web:item_os_add' os_pk=os.pk %}"
+                    hx-target="#modal-content"
+                    hx-swap="innerHTML"
+                    hx-on::after-request="bootstrap.Modal.getOrCreateInstance(document.getElementById('modal')).show()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
+                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                    </svg>
+                    Adicionar Item
+                </button>
+            </div>
+            <div class="card-body">
+                {% if itens %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Descrição</th>
+                                <th class="text-center">Qtd</th>
+                                <th class="text-end">Valor Unit.</th>
+                                <th class="text-end">Valor Total</th>
+                                <th class="text-center">Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in itens %}
+                            <tr>
+                                <td>{{ item.descricao }}</td>
+                                <td class="text-center">{{ item.quantidade }}</td>
+                                <td class="text-end">R$ {{ item.valor_unitario }}</td>
+                                <td class="text-end">R$ {{ item.valor_total }}</td>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-sm btn-outline-danger"
+                                        hx-get="{% url 'web:item_os_delete' os_pk=os.pk pk=item.pk %}"
+                                        hx-target="#modal-content"
+                                        hx-swap="innerHTML"
+                                        hx-on::after-request="bootstrap.Modal.getOrCreateInstance(document.getElementById('modal')).show()">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                            <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                                        </svg>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr class="table-dark">
+                                <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                                <td class="text-end"><strong>R$ {{ orcamento.valor_total }}</strong></td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-3">
+                    <p class="mb-0">Nenhum item cadastrado. Clique em "Adicionar Item" para começar.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Orçamento</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>Valor Total:</strong> 
+                    <span class="fs-4 text-primary">R$ {{ orcamento.valor_total }}</span>
+                </div>
+                <div class="mb-3">
+                    <strong>Status:</strong> 
+                    {% if orcamento.aprovado %}
+                        <span class="badge bg-success">Aprovado</span>
+                        {% if orcamento.data_aprovacao %}
+                            <br><small class="text-muted">Aprovado em {{ orcamento.data_aprovacao|date:"d/m/Y H:i" }}</small>
+                        {% endif %}
+                    {% else %}
+                        <span class="badge bg-warning text-dark">Pendente</span>
+                    {% endif %}
+                </div>
+                
+                <form 
+                    hx-post="{% url 'web:orcamento_update' os_pk=os.pk %}"
+                    hx-target="#os-detail-wrapper"
+                    hx-swap="innerHTML"
+                    class="mb-3"
+                >
+                    {% csrf_token %}
+                    <div class="mb-2">
+                        <label class="form-label"><strong>Observações do Orçamento:</strong></label>
+                        {{ orcamento_form.observacoes }}
+                    </div>
+                    <button type="submit" class="btn btn-outline-primary btn-sm w-100">Salvar Observações</button>
+                </form>
+
+                {% if not orcamento.aprovado %}
+                <form 
+                    hx-post="{% url 'web:orcamento_aprovar' os_pk=os.pk %}"
+                    hx-target="#os-detail-wrapper"
+                    hx-swap="innerHTML"
+                >
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success w-100">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle me-2" viewBox="0 0 16 16">
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                            <path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/>
+                        </svg>
+                        Aprovar Orçamento
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Fotos da Movimentação</h5>
+                <button type="button" class="btn btn-sm btn-primary"
+                    hx-get="{% url 'web:foto_movimentacao_add' os_pk=os.pk %}"
+                    hx-target="#modal-content"
+                    hx-swap="innerHTML"
+                    hx-on::after-request="bootstrap.Modal.getOrCreateInstance(document.getElementById('modal')).show()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-camera" viewBox="0 0 16 16">
+                        <path d="M15 12s1 0 1-1-1-4-6-4-6 3-6 4 1 1 1 1h8zm-7.5-3.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
+                        <path d="M2 4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v14l-5-2.5L2 18V4z"/>
+                    </svg>
+                    Adicionar Foto
+                </button>
+            </div>
+            <div class="card-body">
+                {% if fotos_movimentacao %}
+                <div class="row g-3">
+                    {% for foto in fotos_movimentacao %}
+                    <div class="col-md-4 col-lg-3">
+                        <div class="card h-100">
+                            <img src="{{ foto.imagem.url }}" class="card-img-top" alt="{{ foto.descricao }}" 
+                                 style="height: 150px; object-fit: cover;">
+                            <div class="card-body p-2">
+                                <p class="card-text small mb-1">
+                                    {% if foto.tipo_foto == 'entrada' %}
+                                        <span class="badge bg-success">Entrada</span>
+                                    {% elif foto.tipo_foto == 'saida' %}
+                                        <span class="badge bg-warning text-dark">Saída</span>
+                                    {% else %}
+                                        <span class="badge bg-info">Serviço</span>
+                                    {% endif %}
+                                </p>
+                                <p class="card-text small text-muted">{{ foto.descricao|default:"Sem descrição" }}</p>
+                                <div class="text-end">
+                                    <button type="button" class="btn btn-sm btn-outline-danger"
+                                        hx-get="{% url 'web:foto_movimentacao_delete' os_pk=os.pk pk=foto.pk %}"
+                                        hx-target="#modal-content"
+                                        hx-swap="innerHTML"
+                                        hx-on::after-request="bootstrap.Modal.getOrCreateInstance(document.getElementById('modal')).show()"
+                                        title="Excluir foto">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                            <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-3">
+                    <p class="mb-0">Nenhuma foto de movimentação registrada.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Criado Por</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-1"><strong>{{ os.criado_por.get_full_name|default:os.criado_por.username }}</strong></p>
+                <p class="text-muted mb-0">{{ os.data_abertura|date:"d/m/Y H:i" }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

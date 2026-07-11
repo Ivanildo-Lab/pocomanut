@@ -15,8 +15,7 @@
             hx-get="{% url 'web:poco_create' %}"
             hx-target="#modal-content"
             hx-swap="innerHTML"
-            data-bs-toggle="modal"
-            data-bs-target="#modal">
+            hx-on::after-request="bootstrap.Modal.getOrCreateInstance(document.getElementById('modal')).show()">
             
             {# O mesmo ícone de antes #}
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">

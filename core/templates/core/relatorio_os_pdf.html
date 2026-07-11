@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>OS {{ os.numero_os }}</title>
+    <style>
+        @page { size: A4; margin: 0.8cm; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Helvetica', 'Arial', sans-serif; color: #333; font-size: 8.5px; line-height: 1.3; }
+
+        /* Cabeçalho compacto */
+        .header { display: flex; align-items: center; border-bottom: 2px solid #0056b3; padding-bottom: 6px; margin-bottom: 8px; }
+        .header-logo { max-width: 50px; max-height: 40px; margin-right: 10px; }
+        .header-info { flex: 1; }
+        .header-info h1 { font-size: 13px; color: #0056b3; margin: 0; }
+        .header-info p { font-size: 7.5px; color: #555; margin: 1px 0 0 0; }
+        .header-os { text-align: right; }
+        .header-os .os-numero { font-size: 14px; font-weight: bold; color: #0056b3; }
+        .header-os .os-data { font-size: 7.5px; color: #555; }
+
+        /* Seções */
+        .section-title { background-color: #e9ecef; border-left: 4px solid #0056b3; padding: 3px 8px; margin-top: 6px; margin-bottom: 4px; font-size: 9px; font-weight: bold; }
+
+        /* Tabelas */
+        .data-table { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
+        .data-table td { padding: 2px 5px; border: 1px solid #ddd; font-size: 8px; vertical-align: top; }
+        .data-table td.label { font-weight: bold; background-color: #f8f9fa; width: 22%; white-space: nowrap; }
+        .data-table td.value { width: 28%; }
+
+        /* Badges */
+        .badge { display: inline-block; padding: 1px 5px; border-radius: 3px; font-size: 7px; font-weight: bold; color: #fff; }
+        .badge-aberta { background-color: #0d6efd; }
+        .badge-em_andamento { background-color: #ffc107; color: #333; }
+        .badge-aguardando_peca { background-color: #fd7e14; }
+        .badge-concluida { background-color: #198754; }
+        .badge-cancelada { background-color: #dc3545; }
+        .badge-urgente { background-color: #dc3545; }
+        .badge-alta { background-color: #fd7e14; }
+
+        /* Tabela de itens */
+        .items-table { width: 100%; border-collapse: collapse; margin-bottom: 4px; }
+        .items-table th { background-color: #0056b3; color: #fff; padding: 2px 4px; text-align: left; font-size: 7.5px; }
+        .items-table td { padding: 2px 4px; border: 1px solid #ddd; font-size: 8px; }
+        .items-table .text-right { text-align: right; }
+        .items-table .text-center { text-align: center; }
+        .items-table tfoot td { font-weight: bold; background-color: #e9ecef; }
+
+        /* Grid 2 colunas */
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 0 10px; }
+
+        /* Orçamento */
+        .orcamento-box { border: 1.5px solid #0056b3; border-radius: 4px; padding: 5px 8px; margin-top: 4px; }
+        .orcamento-box .valor { font-size: 14px; font-weight: bold; color: #0056b3; text-align: center; margin: 2px 0; }
+        .orcamento-box .status { text-align: center; font-size: 8px; margin-bottom: 3px; }
+
+        /* Observações */
+        .obs-box { border: 1px solid #ddd; border-radius: 3px; padding: 4px 6px; margin-top: 4px; background-color: #fafafa; font-size: 8px; }
+        .obs-box strong { font-size: 8px; }
+
+        /* Rodapé */
+        .footer { margin-top: 8px; border-top: 1px solid #ddd; padding-top: 3px; text-align: center; font-size: 6.5px; color: #999; }
+    </style>
+</head>
+<body>
+    <!-- Cabeçalho compacto: Logo + Empresa | Nº OS -->
+    <div class="header">
+        {% if caminho_logo %}
+            <img src="{{ caminho_logo }}" class="header-logo" alt="Logo">
+        {% endif %}
+        <div class="header-info">
+            <h1>{{ empresa.nome_fantasia }}</h1>
+            <p>{% if empresa.cnpj %}CNPJ: {{ empresa.cnpj }}{% endif %}{% if empresa.telefone %} | Fone: {{ empresa.telefone }}{% endif %}{% if empresa.email %} | {{ empresa.email }}{% endif %}</p>
+        </div>
+        <div class="header-os">
+            <div class="os-numero">{{ os.numero_os }}</div>
+            <div class="os-data">{{ os.data_abertura|date:"d/m/Y H:i" }}</div>
+        </div>
+    </div>
+
+    <!-- Dados da OS + Status -->
+    <div class="section-title">Dados da Ordem de Serviço</div>
+    <div class="two-col">
+        <table class="data-table">
+            <tr><td class="label">Status:</td><td class="value"><span class="badge badge-{{ os.status }}">{{ os.get_status_display }}</span>{% if os.prioridade == 'urgente' %} <span class="badge badge-urgente">Urgente</span>{% elif os.prioridade == 'alta' %} <span class="badge badge-alta">Alta</span>{% endif %}</td></tr>
+            <tr><td class="label">Cliente:</td><td class="value">{{ os.cliente.nome_razao_social }}</td></tr>
+            <tr><td class="label">CPF/CNPJ:</td><td class="value">{{ os.cliente.cpf_cnpj }}</td></tr>
+            {% if os.funcionario_responsavel %}
+            <tr><td class="label">Responsável:</td><td class="value">{{ os.funcionario_responsavel.nome_completo }}</td></tr>
+            {% endif %}
+        </table>
+        <table class="data-table">
+            <tr><td class="label">Previsão Entrega:</td><td class="value">{{ os.data_previsao_entrega|date:"d/m/Y"|default:"-" }}</td></tr>
+            <tr><td class="label">Entrada:</td><td class="value">{{ os.data_entrada|date:"d/m/Y H:i"|default:"-" }}</td></tr>
+            <tr><td class="label">Saída:</td><td class="value">{{ os.data_saida|date:"d/m/Y H:i"|default:"-" }}</td></tr>
+            <tr><td class="label">Conclusão:</td><td class="value">{{ os.data_conclusao|date:"d/m/Y H:i"|default:"-" }}</td></tr>
+        </table>
+    </div>
+
+    <!-- Dados da Bomba -->
+    {% if os.bomba %}
+    <div class="section-title">Bomba</div>
+    <div class="two-col">
+        <table class="data-table">
+            <tr><td class="label">Descrição:</td><td class="value">{{ os.bomba.descricao }}</td></tr>
+            <tr><td class="label">Modelo:</td><td class="value">{{ os.bomba.modelo|default:"-" }}</td></tr>
+            <tr><td class="label">Marca:</td><td class="value">{{ os.bomba.marca|default:"-" }}</td></tr>
+        </table>
+        <table class="data-table">
+            <tr><td class="label">Potência:</td><td class="value">{% if os.bomba.potencia %}{{ os.bomba.potencia }} HP{% else %}-{% endif %}</td></tr>
+            <tr><td class="label">Voltagem:</td><td class="value">{{ os.bomba.get_voltagem_display }}</td></tr>
+            <tr><td class="label">Tipo:</td><td class="value">{% if os.bomba.is_reserva %}Reserva{% if os.bomba.cliente_proprietario %} - {{ os.bomba.cliente_proprietario.nome_razao_social }}{% endif %}{% else %}Própria{% endif %}</td></tr>
+        </table>
+    </div>
+    {% endif %}
+
+    <!-- Poço -->
+    {% if os.poco %}
+    <div class="section-title">Poço</div>
+    <table class="data-table">
+        <tr><td class="label">Identificador:</td><td class="value">{{ os.poco.identificador_poco }}</td><td class="label">Endereço:</td><td class="value">{{ os.poco.endereco_completo }}, {{ os.poco.cidade }}/{{ os.poco.estado }}</td></tr>
+    </table>
+    {% endif %}
+
+    <!-- Itens / Peças -->
+    {% with itens=os.itens.all %}
+    {% if itens %}
+    <div class="section-title">Itens / Peças Utilizadas</div>
+    <table class="items-table">
+        <thead><tr><th style="width:5%">#</th><th style="width:45%">Descrição</th><th class="text-center" style="width:10%">Qtd</th><th class="text-right" style="width:20%">Valor Unit.</th><th class="text-right" style="width:20%">Valor Total</th></tr></thead>
+        <tbody>
+            {% for item in itens %}
+            <tr>
+                <td class="text-center">{{ forloop.counter }}</td>
+                <td>{{ item.descricao }}</td>
+                <td class="text-center">{{ item.quantidade }}</td>
+                <td class="text-right">R$ {{ item.valor_unitario|floatformat:2 }}</td>
+                <td class="text-right">R$ {{ item.valor_total|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot><tr><td colspan="4" class="text-right">TOTAL:</td><td class="text-right">R$ {{ orcamento.valor_total|floatformat:2 }}</td></tr></tfoot>
+    </table>
+    {% endif %}
+    {% endwith %}
+
+    <!-- Orçamento -->
+    <div class="orcamento-box">
+        <div class="two-col">
+            <div>
+                <strong>Orçamento:</strong>
+                <div class="valor">R$ {{ orcamento.valor_total|floatformat:2 }}</div>
+            </div>
+            <div>
+                <strong>Status:</strong>
+                <div class="status">
+                    {% if orcamento.aprovado %}
+                        <span class="badge badge-concluida">Aprovado</span>{% if orcamento.data_aprovacao %} em {{ orcamento.data_aprovacao|date:"d/m/Y" }}{% endif %}
+                    {% else %}
+                        <span class="badge badge-aguardando_peca">Pendente</span>
+                    {% endif %}
+                </div>
+                {% if orcamento.observacoes %}
+                <div style="font-size:7.5px; margin-top:3px;"><strong>Obs Orçamento:</strong> {{ orcamento.observacoes|truncatewords:30 }}</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Observações da OS -->
+    {% if os.observacoes %}
+    <div class="obs-box"><strong>Observações:</strong> {{ os.observacoes|truncatewords:50 }}</div>
+    {% endif %}
+
+    <!-- Rodapé -->
+    <div class="footer">Documento gerado em {{ data_geracao|date:"d/m/Y H:i" }} — {{ empresa.nome_fantasia }} — OS {{ os.numero_os }}</div>
+</body>
+</html>

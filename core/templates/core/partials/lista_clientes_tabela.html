@@ -26,15 +26,13 @@
                 <button type="button" class="btn btn-sm btn-warning"
                     hx-get="{% url 'web:cliente_update' cliente.pk %}"
                     hx-target="#modal-content"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modal">
+                    hx-on::after-request="bootstrap.Modal.getOrCreateInstance(document.getElementById('modal')).show()">
                     <i class="bi bi-pencil"></i> Editar
                 </button>
                 <button type="button" class="btn btn-sm btn-danger"
                     hx-get="{% url 'web:cliente_delete' cliente.pk %}"
                     hx-target="#modal-content"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modal">
+                    hx-on::after-request="bootstrap.Modal.getOrCreateInstance(document.getElementById('modal')).show()">
                     <i class="bi bi-trash"></i> Excluir
                 </button> 
             </td>

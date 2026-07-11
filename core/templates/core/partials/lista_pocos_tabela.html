@@ -37,16 +37,14 @@
                         hx-get="{% url 'web:poco_update' poco.pk %}"
                         hx-target="#modal-content"
                         hx-swap="innerHTML"
-                        data-bs-toggle="modal"
-                        data-bs-target="#modal">
+                        hx-on::after-request="bootstrap.Modal.getOrCreateInstance(document.getElementById('modal')).show()">
                         Editar
                     </button>
 
                     <button type="button" class="btn btn-sm btn-danger"
                         hx-get="{% url 'web:poco_delete' poco.pk %}"
                         hx-target="#modal-content"
-                        data-bs-toggle="modal"
-                        data-bs-target="#modal">
+                        hx-on::after-request="bootstrap.Modal.getOrCreateInstance(document.getElementById('modal')).show()">
                         Excluir
                         <i class="bi bi-trash"></i>
                     </button>   

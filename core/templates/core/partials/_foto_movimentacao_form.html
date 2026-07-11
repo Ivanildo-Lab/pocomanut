@@ -1,0 +1,22 @@
+{% load crispy_forms_tags %}
+
+<div class="modal-header">
+    <h5 class="modal-title">Adicionar Foto da Movimentação</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+</div>
+<div class="modal-body">
+    <form 
+        hx-post="{% url 'web:foto_movimentacao_add' os_pk=os.pk %}"
+        hx-target="#os-detail-wrapper"
+        hx-swap="innerHTML"
+        enctype="multipart/form-data"
+    >
+        {% csrf_token %}
+        {{ form|crispy }}
+        
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Adicionar Foto</button>
+        </div>
+    </form>
+</div>

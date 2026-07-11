@@ -19,15 +19,13 @@
                 <button class="btn btn-sm btn-warning"
                     hx-get="{% url 'web:manutencao_update' manutencao.poco.pk manutencao.pk %}"
                     hx-target="#modal-content"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modal">
+                    hx-on::after-request="bootstrap.Modal.getOrCreateInstance(document.getElementById('modal')).show()">
                     Editar
                 </button>
                 <button class="btn btn-sm btn-danger"
                     hx-get="{% url 'web:manutencao_delete' manutencao.poco.pk manutencao.pk %}"
                     hx-target="#modal-content"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modal">
+                    hx-on::after-request="bootstrap.Modal.getOrCreateInstance(document.getElementById('modal')).show()">
                     Excluir
                 </button>
             </td>

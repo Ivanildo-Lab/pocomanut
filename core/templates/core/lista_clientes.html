@@ -8,8 +8,7 @@
     <button type="button" class="btn btn-primary"
         hx-get="{% url 'web:cliente_create' %}"
         hx-target="#modal-content"
-        data-bs-toggle="modal"
-        data-bs-target="#modal">
+        hx-on::after-request="bootstrap.Modal.getOrCreateInstance(document.getElementById('modal')).show()">
         Novo Cliente
     </button>
 </div>
