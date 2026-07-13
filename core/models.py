@@ -160,7 +160,7 @@ class Bomba(models.Model):
     modelo = models.CharField(max_length=100, verbose_name="Modelo")
     marca = models.CharField(max_length=100, verbose_name="Marca")
     potencia = models.DecimalField(max_digits=7, decimal_places=2, verbose_name="Potência (HP)")
-    voltagem = models.CharField(max_length=3, choices=VOLTAGEM_CHOICES, verbose_name="Voltagem")
+    voltagem = models.CharField(max_length=50, verbose_name="Voltagem")
     numero_nota_fiscal = models.CharField(max_length=50, blank=True, verbose_name="Nº Nota Fiscal")
     is_reserva = models.BooleanField(default=False, verbose_name="Bomba de Reserva")
     cliente_proprietario = models.ForeignKey(Cliente, on_delete=models.SET_NULL, null=True, blank=True, related_name='bombas_proprietarias', verbose_name="Cliente Proprietário")

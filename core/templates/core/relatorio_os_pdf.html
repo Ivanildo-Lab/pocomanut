@@ -107,7 +107,7 @@
         </table>
         <table class="data-table">
             <tr><td class="label">Potência:</td><td class="value">{% if os.bomba.potencia %}{{ os.bomba.potencia }} HP{% else %}-{% endif %}</td></tr>
-            <tr><td class="label">Voltagem:</td><td class="value">{{ os.bomba.get_voltagem_display }}</td></tr>
+            <tr><td class="label">Voltagem:</td><td class="value">{{ os.bomba.voltagem }}</td></tr>
             <tr><td class="label">Tipo:</td><td class="value">{% if os.bomba.is_reserva %}Reserva{% if os.bomba.cliente_proprietario %} - {{ os.bomba.cliente_proprietario.nome_razao_social }}{% endif %}{% else %}Própria{% endif %}</td></tr>
         </table>
     </div>
