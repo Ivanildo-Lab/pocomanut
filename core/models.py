@@ -252,7 +252,7 @@ class OrdemServico(models.Model):
     ]
     
     empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='ordens_servico')
-    numero_os = models.CharField(max_length=20, unique=True, verbose_name="Nº OS")
+    numero_os = models.CharField(max_length=20, verbose_name="Nº OS")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='aberta', verbose_name="Status")
     prioridade = models.CharField(max_length=10, choices=PRIORIDADE_CHOICES, default='normal', verbose_name="Prioridade")
     
@@ -275,19 +275,23 @@ class OrdemServico(models.Model):
         verbose_name = "Ordem de Serviço"
         verbose_name_plural = "Ordens de Serviço"
         ordering = ['-data_abertura']
+        unique_together = [['empresa', 'numero_os']]
     
     def __str__(self):
         return f"{self.numero_os} - {self.cliente.nome_razao_social}"
     
     def save(self, *args, **kwargs):
         if not self.numero_os:
+            from django.db import transaction
             from django.utils import timezone
-            ano = timezone.now().year
-            ultimo = OrdemServico.objects.filter(
-                empresa=self.empresa,
-                numero_os__startswith=f'OS-{ano}'
-            ).count()
-            self.numero_os = f'OS-{ano}-{ultimo + 1:04d}'
+
+            with transaction.atomic():
+                ano = timezone.now().year
+                ultimo = OrdemServico.objects.select_for_update().filter(
+                    empresa=self.empresa,
+                    numero_os__startswith=f'OS-{ano}'
+                ).count()
+                self.numero_os = f'OS-{ano}-{ultimo + 1:04d}'
         super().save(*args, **kwargs)
 
 
