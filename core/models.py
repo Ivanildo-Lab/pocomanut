@@ -290,8 +290,12 @@ class OrdemServico(models.Model):
                 ultimo = OrdemServico.objects.select_for_update().filter(
                     empresa=self.empresa,
                     numero_os__startswith=f'OS-{ano}'
-                ).count()
-                self.numero_os = f'OS-{ano}-{ultimo + 1:04d}'
+                ).order_by('-numero_os').values_list('numero_os', flat=True).first()
+                if ultimo:
+                    num = int(ultimo.split('-')[-1]) + 1
+                else:
+                    num = 1
+                self.numero_os = f'OS-{ano}-{num:04d}'
         super().save(*args, **kwargs)
 
 
