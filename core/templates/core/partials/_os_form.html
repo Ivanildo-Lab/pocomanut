@@ -13,7 +13,76 @@
         hx-swap="innerHTML"
     >
         {% csrf_token %}
-        {{ form|crispy }}
+
+        <h6 class="mt-2 mb-3 text-primary">Dados da Ordem de Serviço</h6>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Cliente *</label>
+            <input type="hidden" name="cliente" id="cliente_id" value="{{ form.cliente.value|default:'' }}">
+            <input type="text" class="form-control" id="cliente_search"
+                   placeholder="Digite para buscar por nome ou CPF/CNPJ..." autocomplete="off"
+                   {% if form.instance.cliente %}value="{{ form.instance.cliente }}"{% endif %}>
+            <div id="cliente_results" class="list-group mt-1" style="max-height:200px; overflow-y:auto;"></div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Poço</label>
+            <input type="hidden" name="poco" id="poco_id" value="{{ form.poco.value|default:'' }}">
+            <input type="text" class="form-control" id="poco_search"
+                   placeholder="Digite para buscar por identificador, cliente ou endereço..." autocomplete="off"
+                   {% if form.instance.poco %}value="{{ form.instance.poco }}"{% endif %}>
+            <div id="poco_results" class="list-group mt-1" style="max-height:200px; overflow-y:auto;"></div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Bomba</label>
+            <input type="hidden" name="bomba" id="bomba_id" value="{{ form.bomba.value|default:'' }}">
+            <input type="text" class="form-control" id="bomba_search"
+                   placeholder="Digite para buscar por descrição, modelo ou marca..." autocomplete="off"
+                   {% if form.instance.bomba %}value="{{ form.instance.bomba }}"{% endif %}>
+            <div id="bomba_results" class="list-group mt-1" style="max-height:200px; overflow-y:auto;"></div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Prioridade</label>
+            <select name="prioridade" class="form-select">
+                <option value="baixa" {% if form.instance.prioridade == 'baixa' %}selected{% endif %}>Baixa</option>
+                <option value="normal" {% if form.instance.prioridade == 'normal' or not form.instance.prioridade %}selected{% endif %}>Normal</option>
+                <option value="alta" {% if form.instance.prioridade == 'alta' %}selected{% endif %}>Alta</option>
+                <option value="urgente" {% if form.instance.prioridade == 'urgente' %}selected{% endif %}>Urgente</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Previsão de Entrega</label>
+            <input type="date" name="data_previsao_entrega" class="form-control"
+                   value="{{ form.instance.data_previsao_entrega|default:''|date:'Y-m-d' }}">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Funcionário Responsável</label>
+            {{ form.funcionario_responsavel }}
+        </div>
+
+        <hr>
+        <h6 class="mt-2 mb-3 text-primary">Controle de Datas</h6>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Data/Hora de Entrada</label>
+            <input type="datetime-local" name="data_entrada" class="form-control"
+                   value="{{ form.instance.data_entrada|default:''|date:'Y-m-d\TH:i' }}">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Data/Hora de Saída</label>
+            <input type="datetime-local" name="data_saida" class="form-control"
+                   value="{{ form.instance.data_saida|default:''|date:'Y-m-d\TH:i' }}">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Observações</label>
+            <textarea name="observacoes" class="form-control" rows="3">{{ form.instance.observacoes|default:'' }}</textarea>
+        </div>
         
         <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -23,3 +92,70 @@
         </div>
     </form>
 </div>
+
+<script>
+(function() {
+    var debounceTimers = {};
+
+    function buscar(field, url) {
+        var input = document.getElementById(field + '_search');
+        var results = document.getElementById(field + '_results');
+        var q = input.value.trim();
+
+        clearTimeout(debounceTimers[field]);
+        debounceTimers[field] = setTimeout(function() {
+            if (q.length < 1) {
+                results.innerHTML = '';
+                return;
+            }
+            fetch(url + '?q=' + encodeURIComponent(q), {
+                headers: {'X-Requested-With': 'XMLHttpRequest'}
+            })
+            .then(function(r) { return r.text(); })
+            .then(function(html) {
+                results.innerHTML = html;
+            });
+        }, 300);
+    }
+
+    document.getElementById('cliente_search').addEventListener('input', function() {
+        buscar('cliente', '{% url "web:buscar_cliente" %}');
+    });
+    document.getElementById('poco_search').addEventListener('input', function() {
+        buscar('poco', '{% url "web:buscar_poco" %}');
+    });
+    document.getElementById('bomba_search').addEventListener('input', function() {
+        buscar('bomba', '{% url "web:buscar_bomba" %}');
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('#cliente_search') && !e.target.closest('#cliente_results')) {
+            document.getElementById('cliente_results').innerHTML = '';
+        }
+        if (!e.target.closest('#poco_search') && !e.target.closest('#poco_results')) {
+            document.getElementById('poco_results').innerHTML = '';
+        }
+        if (!e.target.closest('#bomba_search') && !e.target.closest('#bomba_results')) {
+            document.getElementById('bomba_results').innerHTML = '';
+        }
+    });
+})();
+
+function selecionarCliente(id, nome) {
+    document.getElementById('cliente_id').value = id;
+    document.getElementById('cliente_search').value = nome;
+    document.getElementById('cliente_results').innerHTML = '';
+}
+
+function selecionarPoco(id, texto) {
+    document.getElementById('poco_id').value = id;
+    document.getElementById('poco_search').value = texto;
+    document.getElementById('poco_results').innerHTML = '';
+}
+
+function selecionarBomba(id, texto) {
+    document.getElementById('bomba_id').value = id;
+    document.getElementById('bomba_search').value = texto;
+    document.getElementById('bomba_results').innerHTML = '';
+}
+</script>

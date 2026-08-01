@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # --- Configurações de Segurança ---
 # No PythonAnywhere, você definirá a SECRET_KEY como uma variável de ambiente.
 # Para desenvolvimento local, ele usa a chave padrão.
-SECRET_KEY = os.environ.get('SECRET_KEY', '66595df038e918710741c55712e82ef6d72f7963')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-me-in-production')
 
 # O DEBUG será False no PythonAnywhere e True localmente.
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'

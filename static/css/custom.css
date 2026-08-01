@@ -20,3 +20,11 @@ a[href^="/media/fotos_pocos/"] + br + label[for$="-clear_id"],
 a[href^="/media/fotos_pocos/"] + br {
     display: none;
 }
+
+/* Busca HTMX no form de OS */
+.search-result-item:hover {
+    background-color: #e9ecef;
+}
+.search-result-item:active {
+    background-color: #dee2e6;
+}

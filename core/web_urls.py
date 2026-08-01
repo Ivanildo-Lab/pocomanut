@@ -51,6 +51,9 @@ urlpatterns = [
     path('bombas/<int:bomba_pk>/check-fotos/', views.partial_check_fotos_bomba, name='partial_check_fotos_bomba'),
 
     # --- Módulo de Ordens de Serviço ---
+    path('buscar-cliente/', views.buscar_cliente, name='buscar_cliente'),
+    path('buscar-poco/', views.buscar_poco, name='buscar_poco'),
+    path('buscar-bomba/', views.buscar_bomba, name='buscar_bomba'),
     path('ordens-servico/', views.OrdemServicoListView.as_view(), name='lista_os'),
     path('ordens-servico/nova/', views.os_create_update, name='os_create'),
     path('ordens-servico/<int:pk>/editar/', views.os_create_update, name='os_update'),

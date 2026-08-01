@@ -1,0 +1,12 @@
+{% if clientes %}
+{% for cliente in clientes %}
+<div class="list-group-item list-group-item-action search-result-item" 
+     style="cursor:pointer" 
+     onclick="selecionarCliente('{{ cliente.pk }}', '{{ cliente.nome_razao_social|escapejs }}')">
+    <small class="fw-bold">{{ cliente.nome_razao_social }}</small><br>
+    <small class="text-muted">{{ cliente.cpf_cnpj }}</small>
+</div>
+{% endfor %}
+{% else %}
+<div class="list-group-item text-muted"><small>Nenhum cliente encontrado</small></div>
+{% endif %}

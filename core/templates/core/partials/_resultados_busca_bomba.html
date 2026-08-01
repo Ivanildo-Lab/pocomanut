@@ -1,0 +1,12 @@
+{% if bombas %}
+{% for bomba in bombas %}
+<div class="list-group-item list-group-item-action search-result-item" 
+     style="cursor:pointer" 
+     onclick="selecionarBomba('{{ bomba.pk }}', '{{ bomba.descricao|escapejs }}')">
+    <small class="fw-bold">{{ bomba.descricao }}</small><br>
+    <small class="text-muted">{{ bomba.marca }} {{ bomba.modelo }} — {{ bomba.voltagem }}</small>
+</div>
+{% endfor %}
+{% else %}
+<div class="list-group-item text-muted"><small>Nenhuma bomba encontrada</small></div>
+{% endif %}

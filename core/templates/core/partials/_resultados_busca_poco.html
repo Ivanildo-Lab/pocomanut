@@ -1,0 +1,12 @@
+{% if pocos %}
+{% for poco in pocos %}
+<div class="list-group-item list-group-item-action search-result-item" 
+     style="cursor:pointer" 
+     onclick="selecionarPoco('{{ poco.pk }}', '{{ poco.identificador_poco|escapejs }} — {{ poco.cliente.nome_razao_social|escapejs }}')">
+    <small class="fw-bold">{{ poco.identificador_poco }}</small><br>
+    <small class="text-muted">{{ poco.cliente.nome_razao_social }} — {{ poco.endereco_completo }}</small>
+</div>
+{% endfor %}
+{% else %}
+<div class="list-group-item text-muted"><small>Nenhum poço encontrado</small></div>
+{% endif %}
