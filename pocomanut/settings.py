@@ -14,7 +14,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-me-in-producti
 # O DEBUG será False no PythonAnywhere e True localmente.
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost','geficogestor.pythonanywhere.com']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'geficogestor.pythonanywhere.com', 'pocomanut-geficogestor.pythonanywhere.com']
 
 # --- Aplicações Instaladas ---
 INSTALLED_APPS = [
