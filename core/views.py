@@ -868,8 +868,8 @@ def buscar_cliente(request):
     clientes = Cliente.objects.filter(empresa=empresa)
     if q:
         clientes = clientes.filter(
-            models.Q(nome_razao_social__icontains=q) |
-            models.Q(cpf_cnpj__icontains=q)
+            Q(nome_razao_social__icontains=q) |
+            Q(cpf_cnpj__icontains=q)
         )[:10]
     return render(request, 'core/partials/_resultados_busca_cliente.html', {'clientes': clientes})
 
@@ -881,9 +881,9 @@ def buscar_poco(request):
     pocos = Poco.objects.filter(cliente__empresa=empresa)
     if q:
         pocos = pocos.filter(
-            models.Q(identificador_poco__icontains=q) |
-            models.Q(endereco_completo__icontains=q) |
-            models.Q(cliente__nome_razao_social__icontains=q)
+            Q(identificador_poco__icontains=q) |
+            Q(endereco_completo__icontains=q) |
+            Q(cliente__nome_razao_social__icontains=q)
         )[:10]
     return render(request, 'core/partials/_resultados_busca_poco.html', {'pocos': pocos})
 
@@ -895,9 +895,9 @@ def buscar_bomba(request):
     bombas = Bomba.objects.filter(empresa=empresa)
     if q:
         bombas = bombas.filter(
-            models.Q(descricao__icontains=q) |
-            models.Q(modelo__icontains=q) |
-            models.Q(marca__icontains=q)
+            Q(descricao__icontains=q) |
+            Q(modelo__icontains=q) |
+            Q(marca__icontains=q)
         )[:10]
     return render(request, 'core/partials/_resultados_busca_bomba.html', {'bombas': bombas})
 
