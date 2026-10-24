@@ -1,0 +1,32 @@
+# ---- Não copiar para dentro da imagem Docker ----
+.git
+.gitignore
+
+# Segredos e config local (as variáveis vêm do Coolify)
+.env
+*.env.local
+
+# Ambiente virtual
+venv/
+.venv/
+env/
+
+# Artefatos Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+dist/
+build/
+
+# Mídia (cópia vem do PA no corte) e estáticos gerados
+media/
+staticfiles/
+*.log
+
+# Dumps e arquivos de migração (não vão pra imagem)
+*.sql
+*.sql.gz
+
+# CRÍTICO: local_settings sobrescreve settings com DEBUG=True e DB de root
+pocomanut/local_settings.py

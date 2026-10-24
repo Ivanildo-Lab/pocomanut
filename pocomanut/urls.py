@@ -17,9 +17,10 @@ Including another URLconf
 # pocomanut/urls.py (VERSÃO CORRIGIDA E FINAL)
 
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.static import serve
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -31,5 +32,6 @@ urlpatterns = [
     path('', include('core.web_urls', namespace='web')),
 ]
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Rota /media/ INCONDICIONAL (o helper static() nao serve nada com DEBUG=False ->
+# imagens/fotos dariam 404 em producao; correcao igual ao commit 7d9aa25 do e-metalurgicaservicos)
+re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT})

@@ -14,7 +14,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-me-in-producti
 # O DEBUG será False no PythonAnywhere e True localmente.
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'geficogestor.pythonanywhere.com', 'pocomanut-geficogestor.pythonanywhere.com']
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',') if os.environ.get('DJANGO_ALLOWED_HOSTS') else []
 
 # --- Aplicações Instaladas ---
 INSTALLED_APPS = [
@@ -76,11 +76,11 @@ WSGI_APPLICATION = 'pocomanut.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'geficogestor$pocomanut_db',
-        'USER': 'geficogestor',
-        'PASSWORD': 'gefico1234',
-        'HOST': 'geficogestor.mysql.pythonanywhere-services.com',
-        'PORT': '3306',
+        'NAME': os.environ.get('DB_NAME', 'pocomanut_db'),
+        'USER': os.environ.get('DB_USER', 'appuser'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+        'HOST': os.environ.get('DB_HOST', ''),
+        'PORT': os.environ.get('DB_PORT', '3306'),
     }
 }
 
