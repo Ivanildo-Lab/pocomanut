@@ -125,6 +125,14 @@ STORAGES = {
     },
 }
 
+# --- Configurações de Proxy SSL (Traefik/HTTPS) ---
+# O Traefik termina o HTTPS e encaminha HTTP para o container.
+# Estas flags fazem o Django tratar a requisição como segura.
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = 'Lax'
+
 # --- Configurações Padrão ---
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = 'web:login'
