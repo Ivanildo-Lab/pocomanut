@@ -30,8 +30,8 @@ urlpatterns = [
 
     # Rotas da Aplicação Web (Frontend)
     path('', include('core.web_urls', namespace='web')),
-]
 
-# Rota /media/ INCONDICIONAL (o helper static() nao serve nada com DEBUG=False ->
-# imagens/fotos dariam 404 em producao; correcao igual ao commit 7d9aa25 do e-metalurgicaservicos)
-re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT})
+    # Rota /media/ INCONDICIONAL (o helper static() nao serve nada com DEBUG=False ->
+    # imagens/fotos dariam 404 em producao; correcao igual ao commit 7d9aa25 do e-metalurgicaservicos)
+    re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+]
