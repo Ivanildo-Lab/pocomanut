@@ -17,6 +17,7 @@ class PocoForm(forms.ModelForm):
         fields = [
             'cliente', 'identificador_poco', 'data_perfuração_inicial', 
             'endereco_completo', 'cidade', 'estado', 'localizacao_mapa',
+            'operador_responsavel',
             'profundidade_total', 'diametro_poco', 'profundidade_bomba', 
             'profundidade_injetor', 'cabo_eletrico', 'cabo_nautico', 
             'tubulacao_material', 'modelo_bomba_instalada', 'modelo_gerador', 
@@ -28,6 +29,7 @@ class PocoForm(forms.ModelForm):
                 format='%Y-%m-%d',
                 attrs={'type': 'date'}
             ),
+            'operador_responsavel': forms.Select(attrs={'class': 'form-select'}),
             'equipamento_assistencia': forms.Textarea(attrs={'rows': 4}),
         }
 
@@ -57,6 +59,9 @@ class PocoForm(forms.ModelForm):
             Row(
                 Column('cidade', css_class='form-group col-md-6 mb-0'),
                 Column('estado', css_class='form-group col-md-6 mb-0'),
+            ),
+            Row(
+                Column('operador_responsavel', css_class='form-group col-md-12 mb-0'),
             ),
 
             HTML('<hr>'),

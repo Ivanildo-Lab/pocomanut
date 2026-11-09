@@ -83,6 +83,10 @@
             <td class="label">Localização Geográfica:</td>
             <td class="value">{{ poco.localizacao_mapa|default:"Não informado"}}</td>
         </tr>
+        <tr>
+            <td class="label">Operador Responsável:</td>
+            <td class="value">{{ poco.operador_responsavel.get_full_name|default:poco.operador_responsavel.username|default:"Não informado" }}</td>
+        </tr>
     </table>
 
     <!-- SEÇÃO DE CARACTERÍSTICAS -->

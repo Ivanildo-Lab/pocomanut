@@ -62,6 +62,7 @@ class Poco(models.Model):
     # --- CAMPO DE FOTO PRINCIPAL DO POÇO ---
     #foto_principal = models.ImageField(upload_to='fotos_pocos/', null=True, blank=True, verbose_name="Foto do Poço")
     localizacao_mapa = models.CharField(max_length=255, null=True,blank=True,verbose_name="Localização Geografica")
+    operador_responsavel = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Operador Responsável")
 
     # --- CARACTERÍSTICAS CONSTRUTIVAS (Estado Atual do Equipamento) ---
     profundidade_total = models.DecimalField(max_digits=7, decimal_places=2, help_text="Em metros")
