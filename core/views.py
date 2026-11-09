@@ -252,10 +252,11 @@ def manutencao_create_update(request, poco_pk, pk=None):
         instance = get_object_or_404(Manutencao, pk=pk, poco=poco)
     else:
         instance = None
-    form = ManutencaoForm(request.POST or None, instance=instance, empresa=empresa_do_usuario)
+    form = ManutencaoForm(request.POST or None, instance=instance)
     if request.method == 'POST' and form.is_valid():
         manutencao = form.save(commit=False)
         manutencao.poco = poco
+        manutencao.operador_responsavel = request.user
         manutencao.save()
         return render(request, 'core/partials/_success_triggers.html', {'toast_message': "Registro de manutenção salvo com sucesso!", 'update_event': 'updateManutencaoList'})
     context = {'form': form, 'poco': poco}
