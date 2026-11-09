@@ -118,22 +118,29 @@ class ManutencaoForm(forms.ModelForm):
         fields = [
             'data_manutencao', 'tipo_servico', 'nivel_estatico_medido',
             'nivel_dinamico_medido', 'vazao_medida', 'amperagem_trabalho',
-            'tensao_trabalho', 'observacoes',
+            'tensao_trabalho', 'operador_responsavel', 'observacoes',
         ]
         widgets = {
                 'data_manutencao': forms.DateInput(
                     format='%Y-%m-%d',
                     attrs={'type': 'date'}
                 ),
-
+            'operador_responsavel': forms.Select(attrs={'class': 'form-select'}),
             'observacoes': forms.Textarea(attrs={'rows': 4}),
         }
 
     def __init__(self, *args, **kwargs):
+        empresa = kwargs.pop('empresa', None)
         super().__init__(*args, **kwargs)
         self.helper = FormHelper(self)
         self.helper.form_tag = False
         self.helper.disable_csrf = True
+        
+        # Torna operador_responsavel obrigatório
+        self.fields['operador_responsavel'].required = True
+        if empresa:
+            from django.contrib.auth.models import User
+            self.fields['operador_responsavel'].queryset = User.objects.filter(profile__empresa=empresa).order_by('username')
 
 
 # ============================================================

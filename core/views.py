@@ -244,19 +244,18 @@ def cliente_delete(request, pk):
 
 # --- Manutenções ---
 @login_required
+@login_required
 def manutencao_create_update(request, poco_pk, pk=None):
-    # ... (seu código está correto, mantido como está)
     empresa_do_usuario = request.user.profile.empresa
     poco = get_object_or_404(Poco, pk=poco_pk, cliente__empresa=empresa_do_usuario)
     if pk:
         instance = get_object_or_404(Manutencao, pk=pk, poco=poco)
     else:
         instance = None
-    form = ManutencaoForm(request.POST or None, instance=instance)
+    form = ManutencaoForm(request.POST or None, instance=instance, empresa=empresa_do_usuario)
     if request.method == 'POST' and form.is_valid():
         manutencao = form.save(commit=False)
         manutencao.poco = poco
-        manutencao.operador_responsavel = request.user
         manutencao.save()
         return render(request, 'core/partials/_success_triggers.html', {'toast_message': "Registro de manutenção salvo com sucesso!", 'update_event': 'updateManutencaoList'})
     context = {'form': form, 'poco': poco}
