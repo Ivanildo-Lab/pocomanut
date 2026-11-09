@@ -35,9 +35,17 @@ class PocoForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         empresa = kwargs.pop('empresa', None)
+        instance = kwargs.get('instance')
         super().__init__(*args, **kwargs)
         if empresa:
             self.fields['cliente'].queryset = Cliente.objects.filter(empresa=empresa)
+        
+        # operador_responsavel é preenchido automaticamente (somente leitura)
+        if 'operador_responsavel' in self.fields:
+            self.fields['operador_responsavel'].disabled = True
+            self.fields['operador_responsavel'].required = False
+            if instance and instance.operador_responsavel:
+                self.fields['operador_responsavel'].initial = instance.operador_responsavel
         
         self.helper = FormHelper(self)
         self.helper.form_tag = False

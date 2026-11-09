@@ -132,6 +132,7 @@ class PocoDetailView(DetailView):
 # ===================================================================
 # --- Poços ---
 @login_required
+@login_required
 def poco_create_update(request, pk=None):
     empresa_do_usuario = request.user.profile.empresa
     if pk:
@@ -140,7 +141,11 @@ def poco_create_update(request, pk=None):
         instance = None
     form = PocoForm(request.POST or None, request.FILES or None, instance=instance, empresa=empresa_do_usuario) 
     if request.method == 'POST' and form.is_valid():
-        form.save()
+        poco = form.save(commit=False)
+        # operador_responsavel é sempre o usuário logado no momento da criação
+        if not instance:  # apenas na criação
+            poco.operador_responsavel = request.user
+        poco.save()
         return render(request, 'core/partials/_success_triggers.html', {'toast_message': "Poço salvo com sucesso!", 'update_event': 'updatePocoList'})
     context = {'form': form, 'instance': instance}
     return render(request, 'core/partials/_poco_form.html', context)
